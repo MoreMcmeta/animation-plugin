@@ -18,8 +18,8 @@ configurations {
 }
 
 dependencies {
-    forge "net.minecraftforge:forge:${rootProject.forge_version}"
-    modImplementation "io.github.moremcmeta:moremcmeta-forge:${rootProject.moremcmeta_version}"
+    forge "net.minecraftforge:forge:${project.forge_version}"
+    modImplementation "io.github.moremcmeta:moremcmeta-forge:${project.moremcmeta_version}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive false }
@@ -69,7 +69,7 @@ components.java {
 publishing {
     publications {
         mavenForge(MavenPublication) {
-            artifactId = rootProject.archives_base_name + "-" + project.name
+            artifactId = project.archives_base_name + "-" + project.name
             from components.java
         }
     }
