@@ -1,6 +1,6 @@
-package io.github.myorg.myplugin.forge;
+package io.github.moremcmeta.animationplugin.forge;
 
-import io.github.myorg.myplugin.ExampleMod;
+import io.github.moremcmeta.animationplugin.ExampleMod;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.IExtensionPoint;

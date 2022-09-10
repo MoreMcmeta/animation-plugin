@@ -1,4 +1,4 @@
-package io.github.myorg.myplugin;
+package io.github.moremcmeta.animationplugin;
 
 public class ExampleMod {
     public static final String MOD_ID = "moremcmeta_animation_plugin";

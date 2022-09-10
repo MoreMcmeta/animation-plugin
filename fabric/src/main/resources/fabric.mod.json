@@ -15,7 +15,7 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "io.github.myorg.myplugin.fabric.ExampleModFabric"
+      "io.github.moremcmeta.animationplugin.fabric.ExampleModFabric"
     ]
   },
   "depends": {

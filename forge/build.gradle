@@ -19,7 +19,6 @@ configurations {
 
 dependencies {
     forge "net.minecraftforge:forge:${project.forge_version}"
-    modImplementation "io.github.moremcmeta:moremcmeta-forge:${project.moremcmeta_version}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive false }
@@ -77,36 +76,5 @@ publishing {
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
         // Add repositories to publish to here.
-    }
-}
-
-if (System.getenv("CURSEFORGE_TOKEN") != null) {
-    curseforge {
-        apiKey = System.getenv("CURSEFORGE_TOKEN")
-        project {
-            id = project.forge_curseforge_id
-            releaseType = "release"
-            addGameVersion "Forge"
-            addGameVersion "Java $project.java_version"
-            addGameVersion project.minecraft_version
-            mainArtifact(remapJar.archiveFile) {
-                displayName = "v$version"
-            }
-            changelog = System.getenv("CHANGELOG")
-            changelogType = "markdown"
-        }
-    }
-}
-
-if (System.getenv("MODRINTH_TOKEN") != null) {
-    modrinth {
-        token = System.getenv("MODRINTH_TOKEN")
-        projectId = project.modrinth_id
-        changelog = System.getenv("CHANGELOG")
-        versionNumber = "v$version-forge"
-        versionType = "release"
-        uploadFile = remapJar
-        gameVersions = [project.minecraft_version]
-        loaders = ["forge"]
     }
 }
