@@ -14,8 +14,8 @@
   "license": "LGPL-3.0",
   "environment": "*",
   "entrypoints": {
-    "client": [
-      "io.github.moremcmeta.animationplugin.fabric.ExampleModFabric"
+    "moremcmeta-client": [
+      "io.github.moremcmeta.animationplugin.fabric.AnimationPluginFabric"
     ]
   },
   "depends": {

@@ -1,20 +1,23 @@
 package io.github.moremcmeta.animationplugin.forge;
 
-import io.github.moremcmeta.animationplugin.ExampleMod;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
+import io.github.moremcmeta.animationplugin.ModConstants;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkConstants;
 
-@Mod(ExampleMod.MOD_ID)
-public class ExampleModForge extends ExampleMod {
+/**
+ * Mod entrypoint on Forge.
+ * @author soir20
+ */
+@SuppressWarnings("unused")
+@Mod(ModConstants.MOD_ID)
+public class EntrypointForge {
 
     /**
      * Serves as mod entrypoint on Forge and tells the server to ignore this mod.
      */
-    public ExampleModForge() {
+    public EntrypointForge() {
 
         /* Make sure the mod being absent on the other network side does not
            cause the client to display the server as incompatible. */
@@ -26,7 +29,6 @@ public class ExampleModForge extends ExampleMod {
                 )
         );
 
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> this::start);
     }
 
 }
