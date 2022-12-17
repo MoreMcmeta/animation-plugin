@@ -17,17 +17,19 @@ import java.util.Optional;
 public class AnimationMetadataParser implements MetadataParser {
     @Override
     public ParsedMetadata parse(MetadataView metadata) throws InvalidMetadataException {
-        Optional<Integer> frameWidth = metadata.integerValue("width");
-        Optional<Integer> frameHeight = metadata.integerValue("height");
+        MetadataView sectionMetadata = metadata.subView(ModConstants.SECTION_NAME).orElseThrow();
 
-        int defaultTime = metadata.integerValue("frametime").orElse(1);
+        Optional<Integer> frameWidth = sectionMetadata.integerValue("width");
+        Optional<Integer> frameHeight = sectionMetadata.integerValue("height");
+
+        int defaultTime = sectionMetadata.integerValue("frametime").orElse(1);
         if (defaultTime <= 0) {
             throw new InvalidMetadataException("Frame time must be positive but was: " + defaultTime);
         }
 
-        boolean interpolate = metadata.booleanValue("interpolate").orElse(false);
+        boolean interpolate = sectionMetadata.booleanValue("interpolate").orElse(false);
 
-        Optional<MetadataView> framesViewOptional = metadata.subView("frames");
+        Optional<MetadataView> framesViewOptional = sectionMetadata.subView("frames");
 
         List<IntIntPair> frames;
         if (framesViewOptional.isPresent()) {
