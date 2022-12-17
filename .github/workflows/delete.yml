@@ -1,0 +1,18 @@
+name: Clean up prerelease packages from deleted branches and tags
+on: [delete]
+jobs:
+  cleanup_packages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        loader: [forge, fabric, common]
+    steps:
+      - uses: actions/delete-package-versions@ec4518c513bda18aa7d8488f78731040ed63fce9
+        with:
+          package-name: io.github.moremcmeta.animation-plugin-${{ matrix.loader }}
+          min-versions-to-keep: 0
+          ignore-versions: ^[\d.]+-(?!${{ github.event.ref }}-SNAPSHOT).*$
+          token: ${{ secrets.GITHUB_TOKEN }}
