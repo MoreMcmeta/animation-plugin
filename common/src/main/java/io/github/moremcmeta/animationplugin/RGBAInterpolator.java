@@ -43,7 +43,7 @@ public class RGBAInterpolator implements Interpolator {
         int green = mixComponent(startProportion, startColor.green(), endColor.green());
         int blue = mixComponent(startProportion, startColor.blue(), endColor.blue());
 
-        return new Color(startColor.alpha(), red, green, blue);
+        return new Color(red, green, blue, startColor.alpha());
     }
 
     /**
