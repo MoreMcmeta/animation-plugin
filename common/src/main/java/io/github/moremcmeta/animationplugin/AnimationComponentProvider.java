@@ -69,7 +69,7 @@ public class AnimationComponentProvider implements ComponentProvider {
                         frames.frame(frameIndex).transform(
                                 (otherOverwritePoint, otherDependencyFunction) -> {
                                     Color otherColor = otherDependencyFunction.apply(otherOverwritePoint);
-                                    if (firstColor.equals(otherColor)) {
+                                    if (!firstColor.equalsOrBothInvisible(otherColor)) {
                                         areaBuilder.addPixel(overwritePoint);
                                         isDifferent.set(true);
                                     }
