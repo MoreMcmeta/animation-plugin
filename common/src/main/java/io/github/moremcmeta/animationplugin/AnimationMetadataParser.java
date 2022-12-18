@@ -16,11 +16,19 @@ import java.util.Optional;
  */
 public class AnimationMetadataParser implements MetadataParser {
     @Override
-    public ParsedMetadata parse(MetadataView metadata) throws InvalidMetadataException {
+    public ParsedMetadata parse(MetadataView metadata, int imageWidth, int imageHeight) throws InvalidMetadataException {
         MetadataView sectionMetadata = metadata.subView(ModConstants.SECTION_NAME).orElseThrow();
 
-        Optional<Integer> frameWidth = sectionMetadata.integerValue("width");
-        Optional<Integer> frameHeight = sectionMetadata.integerValue("height");
+        Optional<Integer> metadataFrameWidth = sectionMetadata.integerValue("width");
+        Optional<Integer> metadataFrameHeight = sectionMetadata.integerValue("height");
+
+        int frameWidth = metadataFrameWidth.orElse(imageWidth);
+        int frameHeight = metadataFrameHeight.orElse(imageHeight);
+        if (metadataFrameWidth.isEmpty() && metadataFrameHeight.isEmpty()) {
+            int dimension = Math.min(frameWidth, frameHeight);
+            frameWidth = dimension;
+            frameHeight = dimension;
+        }
 
         int defaultTime = sectionMetadata.integerValue("frametime").orElse(1);
         if (defaultTime <= 0) {

@@ -13,10 +13,9 @@ import static java.util.Objects.requireNonNull;
  * Contains animation metadata that has been parsed.
  * @author soir20
  */
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class AnimationMetadata implements ParsedMetadata {
-    private final Optional<Integer> FRAME_WIDTH;
-    private final Optional<Integer> FRAME_HEIGHT;
+    private final int FRAME_WIDTH;
+    private final int FRAME_HEIGHT;
     private final int DEFAULT_TIME;
     private final boolean INTERPOLATE;
     private final ImmutableList<IntIntPair> FRAMES;
@@ -29,10 +28,10 @@ public class AnimationMetadata implements ParsedMetadata {
      * @param interpolate       whether to interpolate frames in the animation
      * @param frames            frames in the animation
      */
-    public AnimationMetadata(Optional<Integer> frameWidth, Optional<Integer> frameHeight,
-                             int defaultTime, boolean interpolate, List<IntIntPair> frames) {
-        FRAME_WIDTH = requireNonNull(frameWidth, "Frame width optional cannot be null");
-        FRAME_HEIGHT = requireNonNull(frameHeight, "Frame height optional cannot be null");
+    public AnimationMetadata(int frameWidth, int frameHeight, int defaultTime, boolean interpolate,
+                             List<IntIntPair> frames) {
+        FRAME_WIDTH = frameWidth;
+        FRAME_HEIGHT = frameHeight;
         DEFAULT_TIME = defaultTime;
         INTERPOLATE = interpolate;
         FRAMES = requireNonNull(ImmutableList.copyOf(frames), "Frames cannot be null");
@@ -40,12 +39,12 @@ public class AnimationMetadata implements ParsedMetadata {
 
     @Override
     public Optional<Integer> frameWidth() {
-        return FRAME_WIDTH;
+        return Optional.of(FRAME_WIDTH);
     }
 
     @Override
     public Optional<Integer> frameHeight() {
-        return FRAME_HEIGHT;
+        return Optional.of(FRAME_HEIGHT);
     }
 
     /**
