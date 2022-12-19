@@ -19,6 +19,7 @@ public class AnimationMetadata implements ParsedMetadata {
     private final int DEFAULT_TIME;
     private final boolean INTERPOLATE;
     private final ImmutableList<IntIntPair> FRAMES;
+    private final boolean DAYTIME_SYNC;
 
     /**
      * Creates a new container for animation metadata.
@@ -27,14 +28,16 @@ public class AnimationMetadata implements ParsedMetadata {
      * @param defaultTime       default time for a frame in the animation
      * @param interpolate       whether to interpolate frames in the animation
      * @param frames            frames in the animation
+     * @param daytimeSync       whether to synchronize the animation to the time of day
      */
     public AnimationMetadata(int frameWidth, int frameHeight, int defaultTime, boolean interpolate,
-                             List<IntIntPair> frames) {
+                             List<IntIntPair> frames, boolean daytimeSync) {
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
         DEFAULT_TIME = defaultTime;
         INTERPOLATE = interpolate;
         FRAMES = requireNonNull(ImmutableList.copyOf(frames), "Frames cannot be null");
+        DAYTIME_SYNC = daytimeSync;
     }
 
     @Override
@@ -70,6 +73,14 @@ public class AnimationMetadata implements ParsedMetadata {
      */
     public ImmutableList<IntIntPair> predefinedFrames() {
         return FRAMES;
+    }
+
+    /**
+     * Gets whether to synchronize the animation to the time of day.
+     * @return whether to synchronize the animation to the time of day
+     */
+    public boolean daytimeSync() {
+        return DAYTIME_SYNC;
     }
 
 }

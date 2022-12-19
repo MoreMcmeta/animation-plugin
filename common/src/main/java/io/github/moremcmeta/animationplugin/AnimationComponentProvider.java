@@ -9,8 +9,13 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.IntUnaryOperator;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -19,6 +24,8 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class AnimationComponentProvider implements ComponentProvider {
+    private static final int TICKS_PER_DAY = 24000;
+    private static final WobbleFunction WOBBLE_FUNCTION = new WobbleFunction();
 
     @Override
     public TextureComponent<CurrentFrameView, UploadableFrameView>
@@ -29,17 +36,31 @@ public class AnimationComponentProvider implements ComponentProvider {
 
         Area changedArea = animationMetadata.interpolate() ? findChangedArea(frames) : Area.of();
 
-        return new AnimationComponent(
-                changedArea,
-                frames.frames(),
-                (index) -> {
-                    if (animationMetadata.predefinedFrames().isEmpty()) {
-                        return animationMetadata.defaultTime();
-                    }
+        // Frame time calculation
+        IntUnaryOperator frameTimeCalculator = (index) -> {
+            if (animationMetadata.predefinedFrames().isEmpty()) {
+                return animationMetadata.defaultTime();
+            }
 
-                    return animationMetadata.predefinedFrames().get(index).rightInt();
-                }
-        );
+            return animationMetadata.predefinedFrames().get(index).rightInt();
+        };
+
+        // Time retrieval
+        Supplier<Optional<Long>> timeGetter = () -> {
+            if (Minecraft.getInstance().level == null) {
+                return Optional.empty();
+            }
+
+            ClientLevel level = Minecraft.getInstance().level;
+            long time = WOBBLE_FUNCTION.calculate(level.dayTime(), level.getGameTime(), level.dimensionType().natural());
+            return Optional.of(time);
+        };
+
+        if (animationMetadata.daytimeSync()) {
+            return new AnimationComponent(changedArea, frames.frames(), frameTimeCalculator, TICKS_PER_DAY, timeGetter);
+        }
+
+        return new AnimationComponent(changedArea, frames.frames(), frameTimeCalculator);
     }
 
     /**

@@ -15,6 +15,7 @@ import java.util.Optional;
  * @author soir20
  */
 public class AnimationMetadataParser implements MetadataParser {
+
     @Override
     public ParsedMetadata parse(MetadataView metadata, int imageWidth, int imageHeight) throws InvalidMetadataException {
         MetadataView sectionMetadata = metadata.subView(ModConstants.SECTION_NAME).orElseThrow();
@@ -36,9 +37,9 @@ public class AnimationMetadataParser implements MetadataParser {
         }
 
         boolean interpolate = sectionMetadata.booleanValue("interpolate").orElse(false);
+        boolean daytimeSync = sectionMetadata.booleanValue("daytimeSync").orElse(false);
 
         Optional<MetadataView> framesViewOptional = sectionMetadata.subView("frames");
-
         List<IntIntPair> frames;
         if (framesViewOptional.isPresent()) {
             frames = parseFrameList(framesViewOptional.get(), defaultTime);
@@ -46,7 +47,7 @@ public class AnimationMetadataParser implements MetadataParser {
             frames = ImmutableList.of();
         }
 
-        return new AnimationMetadata(frameWidth, frameHeight, defaultTime, interpolate, frames);
+        return new AnimationMetadata(frameWidth, frameHeight, defaultTime, interpolate, frames, daytimeSync);
     }
 
     /**
