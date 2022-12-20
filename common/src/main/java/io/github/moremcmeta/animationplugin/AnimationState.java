@@ -15,7 +15,7 @@ public class AnimationState {
     private int ticksInThisFrame;
     private int currentFrameIndex;
     private int currentFrameMaxTime;
-    private int allTimeTicks;
+    private long allTimeTicks;
 
     /**
      * Creates an animation state.
@@ -37,23 +37,44 @@ public class AnimationState {
         currentFrameMaxTime = calcMaxFrameTime(0);
     }
 
+    /**
+     * Gets the index of the current frame, which is the frame to start interpolation at.
+     * @return index of the current frame
+     */
     public int startIndex() {
         return currentFrameIndex;
     }
 
+    /**
+     * Gets the index of the frame to end interpolation at. If the animation is at the first tick of the
+     * current frame, the current frame is returned, since there should be no interpolation.
+     * @return index of the frame to end interpolation at
+     */
     public int endIndex() {
         return ticksInThisFrame == 0 ? currentFrameIndex : (currentFrameIndex + 1) % FRAMES;
     }
 
+    /**
+     * Gets the number of ticks in the current frame so far.
+     * @return number of ticks in the current frame
+     */
     public int frameTicks() {
         return ticksInThisFrame;
     }
 
+    /**
+     * Gets the maximum number of ticks in the current frame.
+     * @return maximum number of ticks in the current frame
+     */
     public int frameMaxTime() {
         return currentFrameMaxTime;
     }
 
-    public int ticks() {
+    /**
+     * Gets the total number of ticks in the lifetime of this state.
+     * @return total number of ticks
+     */
+    public long ticks() {
         return allTimeTicks;
     }
 
