@@ -56,11 +56,24 @@ public class AnimationComponentProvider implements ComponentProvider {
             return Optional.of(time);
         };
 
+        Interpolator interpolator = new RGBAInterpolator();
+
         if (animationMetadata.daytimeSync()) {
-            return new AnimationComponent(changedArea, frames.frames(), frameTimeCalculator, TICKS_PER_DAY, timeGetter);
+            return new AnimationComponent(
+                    changedArea,
+                    frames.frames(),
+                    frameTimeCalculator,
+                    interpolator,
+                    TICKS_PER_DAY,
+                    timeGetter);
         }
 
-        return new AnimationComponent(changedArea, frames.frames(), frameTimeCalculator);
+        return new AnimationComponent(
+                changedArea,
+                frames.frames(),
+                frameTimeCalculator,
+                interpolator
+        );
     }
 
     /**
