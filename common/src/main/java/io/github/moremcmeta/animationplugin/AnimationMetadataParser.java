@@ -88,10 +88,14 @@ public class AnimationMetadataParser implements MetadataParser {
                 () -> new InvalidMetadataException("Missing required property \"index\" for")
         );
         if (index < 0) {
-            throw new RuntimeException();
+            throw new InvalidMetadataException("Frame index cannot be negative, but was " + index);
         }
 
         int frameTime = frameObj.integerValue("time").orElse(defaultTime);
+        if (frameTime <= 0) {
+            throw new InvalidMetadataException("Frame time must be greater than zero, but was " + frameTime);
+        }
+
         return IntIntPair.of(index, frameTime);
     }
 
