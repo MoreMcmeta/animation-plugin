@@ -10,6 +10,8 @@ import it.unimi.dsi.fastutil.ints.IntIntPair;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Parses animation metadata into {@link AnimationMetadata}s.
  * @author soir20
@@ -18,6 +20,8 @@ public class AnimationMetadataParser implements MetadataParser {
 
     @Override
     public ParsedMetadata parse(MetadataView metadata, int imageWidth, int imageHeight) throws InvalidMetadataException {
+        requireNonNull(metadata, "Metadata cannot be null");
+
         MetadataView sectionMetadata = metadata.subView(ModConstants.SECTION_NAME).orElseThrow();
 
         Optional<Integer> metadataFrameWidth = sectionMetadata.integerValue("width");
