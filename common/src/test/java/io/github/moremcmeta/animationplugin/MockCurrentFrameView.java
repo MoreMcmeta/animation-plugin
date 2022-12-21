@@ -18,11 +18,12 @@ import static io.github.moremcmeta.animationplugin.AnimationComponentTest.indexT
  * @author soir20
  */
 public class MockCurrentFrameView implements CurrentFrameView {
-    private final int DIMENSION = 100;
+    private final int WIDTH = 10;
+    private final int HEIGHT = 20;
     private final int[][] PIXELS;
 
     public MockCurrentFrameView() {
-        PIXELS = new int[DIMENSION][DIMENSION];
+        PIXELS = new int[HEIGHT][WIDTH];
         replaceWith(0);
     }
 
@@ -43,19 +44,19 @@ public class MockCurrentFrameView implements CurrentFrameView {
     public void replaceWith(int index) {
         int newColor = indexToColor(index).combine();
 
-        for (int y = 0; y < DIMENSION; y++) {
+        for (int y = 0; y < HEIGHT; y++) {
             Arrays.fill(PIXELS[y], newColor);
         }
     }
 
     @Override
     public int width() {
-        return DIMENSION;
+        return WIDTH;
     }
 
     @Override
     public int height() {
-        return DIMENSION;
+        return HEIGHT;
     }
 
     @Override

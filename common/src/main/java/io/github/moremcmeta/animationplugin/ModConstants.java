@@ -2,6 +2,9 @@ package io.github.moremcmeta.animationplugin;
 
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import net.minecraft.client.Minecraft;
+
+import java.util.Optional;
 
 /**
  * Constants for both Fabric and Forge implementations of the plugin.
@@ -12,5 +15,7 @@ public class ModConstants {
     public static final String SECTION_NAME = "animation";
     public static final String DISPLAY_NAME = "MoreMcmeta Animations";
     public static final MetadataParser PARSER = new AnimationMetadataParser();
-    public static final ComponentProvider COMPONENT_PROVIDER = new AnimationComponentProvider();
+    public static final ComponentProvider COMPONENT_PROVIDER = new AnimationComponentProvider(
+            () -> Optional.ofNullable(Minecraft.getInstance().level)
+    );
 }

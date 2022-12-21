@@ -25,12 +25,12 @@ public class MockPersistentFrameView implements PersistentFrameView {
 
     @Override
     public int width() {
-        return 100;
+        return 10;
     }
 
     @Override
     public int height() {
-        return 100;
+        return 20;
     }
 
     @Override
