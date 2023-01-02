@@ -19,7 +19,6 @@
     ]
   },
   "depends": {
-    "fabric": "*",
     "minecraft": ">=${minecraftVersion}",
     "moremcmeta": "${minMoreMcmetaVersion}"
   }
