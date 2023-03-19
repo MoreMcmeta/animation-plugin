@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the {@link AnimationComponent}.
@@ -26,39 +26,52 @@ public class AnimationComponentTest {
     @Test
     public void construct_NotSyncedNullInterpolateArea_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(null, 5, (frame) -> 10, INTERPOLATOR);
+        new AnimationComponent(null, 5, (frame) -> 10, (frame) -> frame, INTERPOLATOR);
     }
 
     @Test
     public void construct_NotSyncedNullFrameTimeCalculator_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, null, INTERPOLATOR);
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, null, (frame) -> frame, INTERPOLATOR);
+    }
+
+    @Test
+    public void construct_NotSyncedNullIndexMapper_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, null, INTERPOLATOR);
     }
 
     @Test
     public void construct_NotSyncedNullInterpolator_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, null);
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, (frame) -> frame, null);
     }
 
     @Test
     public void construct_SyncedNullInterpolateArea_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(null, 5, (frame) -> 10, INTERPOLATOR,
+        new AnimationComponent(null, 5, (frame) -> 10, (frame) -> frame, INTERPOLATOR,
                 24000, () -> Optional.of(10L));
     }
 
     @Test
     public void construct_SyncedNullFrameTimeCalculator_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, null, INTERPOLATOR,
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, null, (frame) -> frame, INTERPOLATOR,
+                24000, () -> Optional.of(10L));
+    }
+
+    @Test
+    public void construct_SyncedNullIndexMapper_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, null, INTERPOLATOR,
                 24000, () -> Optional.of(10L));
     }
 
     @Test
     public void construct_SyncedNullInterpolator_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, null,
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, (frame) -> frame, null,
                 24000, () -> Optional.of(10L));
     }
 
@@ -66,7 +79,7 @@ public class AnimationComponentTest {
     public void construct_SyncedNegativeTicks_IllegalArgException() {
         AtomicLong currentTime = new AtomicLong(800);
         expectedException.expect(IllegalArgumentException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, INTERPOLATOR,
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, (frame) -> frame, INTERPOLATOR,
                 -1, () -> Optional.of(currentTime.incrementAndGet()));
     }
 
@@ -74,7 +87,7 @@ public class AnimationComponentTest {
     public void construct_SyncedZeroTicks_IllegalArgException() {
         AtomicLong currentTime = new AtomicLong(800);
         expectedException.expect(IllegalArgumentException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, INTERPOLATOR,
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, (frame) -> frame, INTERPOLATOR,
                 0, () -> Optional.of(currentTime.incrementAndGet()));
     }
 
@@ -82,7 +95,7 @@ public class AnimationComponentTest {
     @SuppressWarnings("OptionalAssignedToNull")
     public void tick_SyncedTimeGetterReturnsNull_NullPointerException() {
         AnimationComponent component = new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10,
-                INTERPOLATOR, 375, () -> null);
+                (frame) -> frame, INTERPOLATOR, 375, () -> null);
         expectedException.expect(NullPointerException.class);
         component.onTick(new MockCurrentFrameView(), new MockPersistentFrameGroup(5));
     }
@@ -96,6 +109,7 @@ public class AnimationComponentTest {
                 Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
+                (frame) -> frame,
                 INTERPOLATOR
         );
 
@@ -115,6 +129,7 @@ public class AnimationComponentTest {
                 Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
+                (frame) -> frame,
                 INTERPOLATOR
         );
 
@@ -139,6 +154,7 @@ public class AnimationComponentTest {
                 Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
+                (frame) -> frame,
                 INTERPOLATOR,
                 800,
                 () -> Optional.of(currentTime.incrementAndGet())
@@ -162,6 +178,7 @@ public class AnimationComponentTest {
                 Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
+                (frame) -> frame,
                 INTERPOLATOR,
                 800,
                 () -> Optional.of(currentTime.incrementAndGet())
@@ -185,6 +202,7 @@ public class AnimationComponentTest {
                 Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
+                (frame) -> frame,
                 INTERPOLATOR,
                 800,
                 () -> Optional.of(currentTime.incrementAndGet())
@@ -208,6 +226,7 @@ public class AnimationComponentTest {
                 Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
+                (frame) -> frame,
                 INTERPOLATOR,
                 800,
                 () -> Optional.of(currentTime.incrementAndGet())
@@ -231,6 +250,7 @@ public class AnimationComponentTest {
                 Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
+                (frame) -> frame,
                 INTERPOLATOR,
                 Integer.MAX_VALUE,
                 () -> Optional.of(currentTime.incrementAndGet())
@@ -254,6 +274,7 @@ public class AnimationComponentTest {
                 Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
+                (frame) -> frame,
                 INTERPOLATOR,
                 800,
                 () -> Optional.of(currentTime.incrementAndGet())

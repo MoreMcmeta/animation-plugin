@@ -19,6 +19,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class AnimationComponent implements TextureComponent<CurrentFrameView, UploadableFrameView> {
     private final AnimationState STATE;
+    private final IntUnaryOperator FRAME_INDEX_MAPPER;
     private final Interpolator INTERPOLATOR;
     private final Area INTERPOLATE_AREA;
     private final int SYNC_TICKS;
@@ -29,13 +30,24 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
      * @param interpolateArea           pixels to interpolate/modify during the animation
      * @param frames                    number of predefined frames in the animation
      * @param frameTimeCalculator       calculates the duration of each frame in ticks
+     * @param frameIndexMapper          maps frame indices to the index of the corresponding predefined frame
      * @param interpolator              interpolates between colors
      * @param syncTicks                 number of ticks to sync to; e.g. 24000 to sync to a Minecraft day
      * @param timeGetter                retrieves the current time in the world, if any
      */
     public AnimationComponent(Area interpolateArea, int frames, IntUnaryOperator frameTimeCalculator,
-                              Interpolator interpolator, int syncTicks, Supplier<Optional<Long>> timeGetter) {
-        this(interpolateArea, frames, frameTimeCalculator, interpolator, syncTicks, timeGetter, false);
+                              IntUnaryOperator frameIndexMapper, Interpolator interpolator, int syncTicks,
+                              Supplier<Optional<Long>> timeGetter) {
+        this(
+                interpolateArea,
+                frames,
+                frameTimeCalculator,
+                frameIndexMapper,
+                interpolator,
+                syncTicks,
+                timeGetter,
+                false
+        );
     }
 
     /**
@@ -43,11 +55,21 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
      * @param interpolateArea           pixels to interpolate/modify during the animation
      * @param frames                    number of predefined frames in the animation
      * @param frameTimeCalculator       calculates the duration of each frame in ticks
+     * @param frameIndexMapper          maps frame indices to the index of the corresponding predefined frame
      * @param interpolator              interpolates between colors
      */
     public AnimationComponent(Area interpolateArea, int frames, IntUnaryOperator frameTimeCalculator,
-                              Interpolator interpolator) {
-        this(interpolateArea, frames, frameTimeCalculator, interpolator, -1, Optional::empty, true);
+                              IntUnaryOperator frameIndexMapper, Interpolator interpolator) {
+        this(
+                interpolateArea,
+                frames,
+                frameTimeCalculator,
+                frameIndexMapper,
+                interpolator,
+                -1,
+                Optional::empty,
+                true
+        );
     }
 
     @Override
@@ -63,8 +85,8 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
             STATE.tick(1);
         }
 
-        int startIndex = STATE.startIndex();
-        int endIndex = STATE.endIndex();
+        int startIndex = FRAME_INDEX_MAPPER.applyAsInt(STATE.startIndex());
+        int endIndex = FRAME_INDEX_MAPPER.applyAsInt(STATE.endIndex());
 
         if (startIndex == endIndex) {
             currentFrame.replaceWith(startIndex);
@@ -75,8 +97,8 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
                 (overwriteX, overwriteY, dependencyFunction) -> INTERPOLATOR.interpolate(
                         STATE.frameMaxTime(),
                         STATE.frameTicks(),
-                        predefinedFrames.frame(STATE.startIndex()).color(overwriteX, overwriteY),
-                        predefinedFrames.frame(STATE.endIndex()).color(overwriteX, overwriteY)
+                        predefinedFrames.frame(startIndex).color(overwriteX, overwriteY),
+                        predefinedFrames.frame(endIndex).color(overwriteX, overwriteY)
                 ),
                 INTERPOLATE_AREA,
                 INTERPOLATE_AREA
@@ -88,16 +110,18 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
      * @param interpolateArea           pixels to interpolate/modify during the animation
      * @param frames                    number of predefined frames in the animation
      * @param frameTimeCalculator       calculates the duration of each frame in ticks
+     * @param frameIndexMapper          maps frame indices to the index of the corresponding predefined frame
      * @param interpolator              interpolates between colors
      * @param syncTicks                 number of ticks to sync to; e.g. 24000 to sync to a Minecraft day
      * @param timeGetter                retrieves the current time in the world, if any
      * @param allowNegativeSyncTicks    whether sync ticks can be negative; true when the animation is not synchronized
      */
     private AnimationComponent(Area interpolateArea, int frames, IntUnaryOperator frameTimeCalculator,
-                               Interpolator interpolator, int syncTicks, Supplier<Optional<Long>> timeGetter,
-                               boolean allowNegativeSyncTicks) {
+                               IntUnaryOperator frameIndexMapper, Interpolator interpolator, int syncTicks,
+                               Supplier<Optional<Long>> timeGetter, boolean allowNegativeSyncTicks) {
         requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
         STATE = new AnimationState(frames, frameTimeCalculator);
+        FRAME_INDEX_MAPPER = requireNonNull(frameIndexMapper, "Frame index mapper cannot be null");
 
         INTERPOLATOR = requireNonNull(interpolator, "Interpolator cannot be null");
         INTERPOLATE_AREA = requireNonNull(interpolateArea, "Interpolate area cannot be null");

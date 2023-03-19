@@ -51,6 +51,12 @@ public class AnimationComponentProvider implements ComponentProvider {
 
         Area changedArea = animationMetadata.interpolate() ? findChangedArea(frames) : Area.of();
 
+        // Number of frames
+        int frameCount = frames.frames();
+        if (!animationMetadata.predefinedFrames().isEmpty()) {
+            frameCount = animationMetadata.predefinedFrames().size();
+        }
+
         // Frame time calculation
         IntUnaryOperator frameTimeCalculator = (index) -> {
             if (animationMetadata.predefinedFrames().isEmpty()) {
@@ -58,6 +64,15 @@ public class AnimationComponentProvider implements ComponentProvider {
             }
 
             return animationMetadata.predefinedFrames().get(index).rightInt();
+        };
+
+        // Index mapping
+        IntUnaryOperator frameIndexMapper = (index) -> {
+            if (animationMetadata.predefinedFrames().isEmpty()) {
+                return index;
+            }
+
+            return animationMetadata.predefinedFrames().get(index).leftInt();
         };
 
         // Time retrieval
@@ -77,8 +92,9 @@ public class AnimationComponentProvider implements ComponentProvider {
         if (animationMetadata.daytimeSync()) {
             return new AnimationComponent(
                     changedArea,
-                    frames.frames(),
+                    frameCount,
                     frameTimeCalculator,
+                    frameIndexMapper,
                     interpolator,
                     TICKS_PER_DAY,
                     timeGetter);
@@ -86,8 +102,9 @@ public class AnimationComponentProvider implements ComponentProvider {
 
         return new AnimationComponent(
                 changedArea,
-                frames.frames(),
+                frameCount,
                 frameTimeCalculator,
+                frameIndexMapper,
                 interpolator
         );
     }

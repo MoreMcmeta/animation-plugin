@@ -34,10 +34,15 @@ public class AnimationComponentProviderTest {
             new MockMutableFrameView(1, Pair.of(Color.pack(20, 20, 20, 20), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),
             new MockMutableFrameView(2, Pair.of(Color.pack(30, 30, 30, 30), Area.of(Point.pack(0, 1), Point.pack(9, 19))))
     );
-    private static final List<IntIntPair> MOCK_FRAME_LIST = List.of(
+    private static final List<IntIntPair> LARGE_MOCK_FRAME_LIST = List.of(
             IntIntPair.of(0, 1),
-            IntIntPair.of(5, 5),
-            IntIntPair.of(2, 27)
+            IntIntPair.of(2, 5),
+            IntIntPair.of(1, 27),
+            IntIntPair.of(2, 3)
+    );
+    private static final List<IntIntPair> SMALL_MOCK_FRAME_LIST = List.of(
+            IntIntPair.of(2, 5),
+            IntIntPair.of(0, 1)
     );
 
     @Rule
@@ -60,7 +65,7 @@ public class AnimationComponentProviderTest {
     public void assemble_NullFrameGroup_NullPointerException() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         expectedException.expect(NullPointerException.class);
-        provider.assemble(new AnimationMetadata(10, 20, 10, true, MOCK_FRAME_LIST, true), null);
+        provider.assemble(new AnimationMetadata(10, 20, 10, true, LARGE_MOCK_FRAME_LIST, true), null);
     }
 
     @Test
@@ -90,22 +95,48 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_NotSyncedHasPredefinedFrames_PredefinedFrameTimeUsed() {
+    public void assemble_NotSyncedHasMorePredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, MOCK_FRAME_LIST, false),
+                new AnimationMetadata(10, 20, 33, true, LARGE_MOCK_FRAME_LIST, false),
                 MOCK_FRAME_GROUP
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
-            int time = MOCK_FRAME_LIST.get((expectedFrame - 1) % MOCK_FRAME_GROUP.frames()).rightInt();
+            int time = LARGE_MOCK_FRAME_LIST.get((expectedFrame - 1) % LARGE_MOCK_FRAME_LIST.size()).rightInt();
             for (int tick = 0; tick < time; tick++) {
                 component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
             }
-            assertEquals(indexToColor(expectedFrame % MOCK_FRAME_GROUP.frames()), currentFrameView.color(0, 0));
+            assertEquals(
+                    indexToColor(LARGE_MOCK_FRAME_LIST.get(expectedFrame % LARGE_MOCK_FRAME_LIST.size()).leftInt()),
+                    currentFrameView.color(0, 0)
+            );
+        }
+    }
+
+    @Test
+    public void assemble_NotSyncedHasFewerPredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
+        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+
+        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+                new AnimationMetadata(10, 20, 33, true, SMALL_MOCK_FRAME_LIST, false),
+                MOCK_FRAME_GROUP
+        );
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+
+        for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
+            int time = SMALL_MOCK_FRAME_LIST.get((expectedFrame - 1) % SMALL_MOCK_FRAME_LIST.size()).rightInt();
+            for (int tick = 0; tick < time; tick++) {
+                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+            }
+            assertEquals(
+                    indexToColor(SMALL_MOCK_FRAME_LIST.get(expectedFrame % SMALL_MOCK_FRAME_LIST.size()).leftInt()),
+                    currentFrameView.color(0, 0)
+            );
         }
     }
 
@@ -129,22 +160,48 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_SyncedHasPredefinedFrames_PredefinedFrameTimeUsed() {
+    public void assemble_SyncedHasMorePredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, MOCK_FRAME_LIST, true),
+                new AnimationMetadata(10, 20, 33, true, LARGE_MOCK_FRAME_LIST, true),
                 MOCK_FRAME_GROUP
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
-            int time = MOCK_FRAME_LIST.get((expectedFrame - 1) % MOCK_FRAME_GROUP.frames()).rightInt();
+            int time = LARGE_MOCK_FRAME_LIST.get((expectedFrame - 1) % LARGE_MOCK_FRAME_LIST.size()).rightInt();
             for (int tick = 0; tick < time; tick++) {
                 component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
             }
-            assertEquals(indexToColor(expectedFrame % MOCK_FRAME_GROUP.frames()), currentFrameView.color(0, 0));
+            assertEquals(
+                    indexToColor(LARGE_MOCK_FRAME_LIST.get(expectedFrame % LARGE_MOCK_FRAME_LIST.size()).leftInt()),
+                    currentFrameView.color(0, 0)
+            );
+        }
+    }
+
+    @Test
+    public void assemble_SyncedHasFewerPredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
+        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+
+        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+                new AnimationMetadata(10, 20, 33, true, SMALL_MOCK_FRAME_LIST, true),
+                MOCK_FRAME_GROUP
+        );
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+
+        for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
+            int time = SMALL_MOCK_FRAME_LIST.get((expectedFrame - 1) % SMALL_MOCK_FRAME_LIST.size()).rightInt();
+            for (int tick = 0; tick < time; tick++) {
+                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+            }
+            assertEquals(
+                    indexToColor(SMALL_MOCK_FRAME_LIST.get(expectedFrame % SMALL_MOCK_FRAME_LIST.size()).leftInt()),
+                    currentFrameView.color(0, 0)
+            );
         }
     }
 
