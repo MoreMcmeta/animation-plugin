@@ -32,13 +32,13 @@ public class AnimationComponentTest {
     @Test
     public void construct_NotSyncedNullFrameTimeCalculator_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(new Point(0, 0)), 5, null, INTERPOLATOR);
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, null, INTERPOLATOR);
     }
 
     @Test
     public void construct_NotSyncedNullInterpolator_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(new Point(0, 0)), 5, (frame) -> 10, null);
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, null);
     }
 
     @Test
@@ -51,14 +51,14 @@ public class AnimationComponentTest {
     @Test
     public void construct_SyncedNullFrameTimeCalculator_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(new Point(0, 0)), 5, null, INTERPOLATOR,
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, null, INTERPOLATOR,
                 24000, () -> Optional.of(10L));
     }
 
     @Test
     public void construct_SyncedNullInterpolator_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(new Point(0, 0)), 5, (frame) -> 10, null,
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, null,
                 24000, () -> Optional.of(10L));
     }
 
@@ -66,7 +66,7 @@ public class AnimationComponentTest {
     public void construct_SyncedNegativeTicks_IllegalArgException() {
         AtomicLong currentTime = new AtomicLong(800);
         expectedException.expect(IllegalArgumentException.class);
-        new AnimationComponent(Area.of(new Point(0, 0)), 5, (frame) -> 10, INTERPOLATOR,
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, INTERPOLATOR,
                 -1, () -> Optional.of(currentTime.incrementAndGet()));
     }
 
@@ -74,14 +74,14 @@ public class AnimationComponentTest {
     public void construct_SyncedZeroTicks_IllegalArgException() {
         AtomicLong currentTime = new AtomicLong(800);
         expectedException.expect(IllegalArgumentException.class);
-        new AnimationComponent(Area.of(new Point(0, 0)), 5, (frame) -> 10, INTERPOLATOR,
+        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10, INTERPOLATOR,
                 0, () -> Optional.of(currentTime.incrementAndGet()));
     }
 
     @Test
     @SuppressWarnings("OptionalAssignedToNull")
     public void tick_SyncedTimeGetterReturnsNull_NullPointerException() {
-        AnimationComponent component = new AnimationComponent(Area.of(new Point(0, 0)), 5, (frame) -> 10,
+        AnimationComponent component = new AnimationComponent(Area.of(Point.pack(0, 0)), 5, (frame) -> 10,
                 INTERPOLATOR, 375, () -> null);
         expectedException.expect(NullPointerException.class);
         component.onTick(new MockCurrentFrameView(), new MockPersistentFrameGroup(5));
@@ -93,7 +93,7 @@ public class AnimationComponentTest {
         int animationLength = 550;
         AtomicInteger tick = new AtomicInteger(0);
         AnimationComponent component = new AnimationComponent(
-                Area.of(new Point(0, 0)),
+                Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
                 INTERPOLATOR
@@ -112,7 +112,7 @@ public class AnimationComponentTest {
     public void tick_NotSyncedPartWay_CorrectAnimFrame() {
         int frames = 10;
         AnimationComponent component = new AnimationComponent(
-                Area.of(new Point(0, 0)),
+                Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
                 INTERPOLATOR
@@ -136,7 +136,7 @@ public class AnimationComponentTest {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(800);
         AnimationComponent component = new AnimationComponent(
-                Area.of(new Point(0, 0)),
+                Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
                 INTERPOLATOR,
@@ -159,7 +159,7 @@ public class AnimationComponentTest {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(-1);
         AnimationComponent component = new AnimationComponent(
-                Area.of(new Point(0, 0)),
+                Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
                 INTERPOLATOR,
@@ -182,7 +182,7 @@ public class AnimationComponentTest {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(375);
         AnimationComponent component = new AnimationComponent(
-                Area.of(new Point(0, 0)),
+                Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
                 INTERPOLATOR,
@@ -205,7 +205,7 @@ public class AnimationComponentTest {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(-375);
         AnimationComponent component = new AnimationComponent(
-                Area.of(new Point(0, 0)),
+                Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
                 INTERPOLATOR,
@@ -228,7 +228,7 @@ public class AnimationComponentTest {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(375);
         AnimationComponent component = new AnimationComponent(
-                Area.of(new Point(0, 0)),
+                Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
                 INTERPOLATOR,
@@ -251,7 +251,7 @@ public class AnimationComponentTest {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(Long.MAX_VALUE);
         AnimationComponent component = new AnimationComponent(
-                Area.of(new Point(0, 0)),
+                Area.of(Point.pack(0, 0)),
                 frames,
                 (frame) -> (frame + 1) * 10,
                 INTERPOLATOR,
@@ -269,8 +269,8 @@ public class AnimationComponentTest {
         );
     }
 
-    public static Color indexToColor(int index) {
-        return new Color(indexToComp(index), indexToComp(index), indexToComp(index), indexToComp(index));
+    public static int indexToColor(int index) {
+        return Color.pack(indexToComp(index), indexToComp(index), indexToComp(index), indexToComp(index));
     }
 
     private static int indexToComp(int index) {

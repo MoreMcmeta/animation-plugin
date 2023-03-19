@@ -2,8 +2,6 @@ package io.github.moremcmeta.animationplugin;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * Generates an interpolated color in between two other colors.
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
@@ -19,10 +17,7 @@ public class RGBAInterpolator implements Interpolator {
      * @param end       the color to end interpolation at
      * @return  the interpolated frame at this step
      */
-    public Color interpolate(int steps, int step, Color start, Color end) {
-        requireNonNull(start, "Start color cannot be null");
-        requireNonNull(end, "End color cannot be null");
-
+    public int interpolate(int steps, int step, int start, int end) {
         if (step < 1 || step >= steps) {
             throw new IllegalArgumentException("Step must be between 1 and steps - 1 (inclusive)");
         }
@@ -38,12 +33,12 @@ public class RGBAInterpolator implements Interpolator {
      * @param endColor          color of the second pixel
      * @return  the resultant mixed color
      */
-    private Color mixPixel(double startProportion, Color startColor, Color endColor) {
-        int red = mixComponent(startProportion, startColor.red(), endColor.red());
-        int green = mixComponent(startProportion, startColor.green(), endColor.green());
-        int blue = mixComponent(startProportion, startColor.blue(), endColor.blue());
+    private int mixPixel(double startProportion, int startColor, int endColor) {
+        int red = mixComponent(startProportion, Color.red(startColor), Color.red(endColor));
+        int green = mixComponent(startProportion, Color.green(startColor), Color.green(endColor));
+        int blue = mixComponent(startProportion, Color.blue(startColor), Color.blue(endColor));
 
-        return new Color(red, green, blue, startColor.alpha());
+        return Color.pack(red, green, blue, Color.alpha(startColor));
     }
 
     /**

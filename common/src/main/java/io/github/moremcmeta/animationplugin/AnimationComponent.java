@@ -72,11 +72,11 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
         }
 
         currentFrame.generateWith(
-                (overwritePoint, dependencyFunction) -> INTERPOLATOR.interpolate(
+                (overwriteX, overwriteY, dependencyFunction) -> INTERPOLATOR.interpolate(
                         STATE.frameMaxTime(),
                         STATE.frameTicks(),
-                        predefinedFrames.frame(STATE.startIndex()).color(overwritePoint.x(), overwritePoint.y()),
-                        predefinedFrames.frame(STATE.endIndex()).color(overwritePoint.x(), overwritePoint.y())
+                        predefinedFrames.frame(STATE.startIndex()).color(overwriteX, overwriteY),
+                        predefinedFrames.frame(STATE.endIndex()).color(overwriteX, overwriteY)
                 ),
                 INTERPOLATE_AREA,
                 INTERPOLATE_AREA

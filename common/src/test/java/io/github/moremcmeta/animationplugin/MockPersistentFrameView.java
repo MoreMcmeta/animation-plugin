@@ -1,6 +1,5 @@
 package io.github.moremcmeta.animationplugin;
 
-import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 
 import java.util.Optional;
@@ -19,7 +18,7 @@ public class MockPersistentFrameView implements PersistentFrameView {
     }
 
     @Override
-    public Color color(int x, int y) {
+    public int color(int x, int y) {
         return indexToColor(INDEX);
     }
 

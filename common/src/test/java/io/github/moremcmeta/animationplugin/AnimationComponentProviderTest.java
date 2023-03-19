@@ -30,9 +30,9 @@ import static io.github.moremcmeta.animationplugin.AnimationComponentTest.indexT
  */
 public class AnimationComponentProviderTest {
     private static final MockMutableFrameGroup MOCK_FRAME_GROUP = new MockMutableFrameGroup(
-            new MockMutableFrameView(0, Pair.of(new Color(10, 10, 10, 10), Area.of(new Point(0, 1), new Point(1, 1)))),
-            new MockMutableFrameView(1, Pair.of(new Color(20, 20, 20, 20), Area.of(new Point(0, 1), new Point(0, 0)))),
-            new MockMutableFrameView(2, Pair.of(new Color(30, 30, 30, 30), Area.of(new Point(0, 1), new Point(9, 19))))
+            new MockMutableFrameView(0, Pair.of(Color.pack(10, 10, 10, 10), Area.of(Point.pack(0, 1), Point.pack(1, 1)))),
+            new MockMutableFrameView(1, Pair.of(Color.pack(20, 20, 20, 20), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),
+            new MockMutableFrameView(2, Pair.of(Color.pack(30, 30, 30, 30), Area.of(Point.pack(0, 1), Point.pack(9, 19))))
     );
     private static final List<IntIntPair> MOCK_FRAME_LIST = List.of(
             IntIntPair.of(0, 1),
@@ -152,7 +152,7 @@ public class AnimationComponentProviderTest {
     public void assemble_DiffPartsChangedInEachFrame_InterpolateAreaCombined() {
         checkChangedPoints(
                 MOCK_FRAME_GROUP,
-                Set.of(new Point(0, 1), new Point(1, 1), new Point(0, 0), new Point(9, 19))
+                Set.of(Point.pack(0, 1), Point.pack(1, 1), Point.pack(0, 0), Point.pack(9, 19))
         );
     }
 
@@ -160,11 +160,11 @@ public class AnimationComponentProviderTest {
     public void assemble_DiffRgbButAlphaZero_InvisibleColorsIgnored() {
         checkChangedPoints(
                 new MockMutableFrameGroup(
-                        new MockMutableFrameView(0, Pair.of(new Color(10, 10, 10, 0), Area.of(new Point(0, 1), new Point(1, 1)))),
-                        new MockMutableFrameView(1, Pair.of(new Color(20, 20, 20, 0), Area.of(new Point(0, 1), new Point(0, 0)))),
-                        new MockMutableFrameView(2, Pair.of(new Color(10, 10, 10, 30), Area.of(new Point(0, 1), new Point(9, 19))))
+                        new MockMutableFrameView(0, Pair.of(Color.pack(10, 10, 10, 0), Area.of(Point.pack(0, 1), Point.pack(1, 1)))),
+                        new MockMutableFrameView(1, Pair.of(Color.pack(20, 20, 20, 0), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),
+                        new MockMutableFrameView(2, Pair.of(Color.pack(10, 10, 10, 30), Area.of(Point.pack(0, 1), Point.pack(9, 19))))
                 ),
-                Set.of(new Point(0, 1), new Point(9, 19))
+                Set.of(Point.pack(0, 1), Point.pack(9, 19))
         );
     }
 
@@ -172,9 +172,9 @@ public class AnimationComponentProviderTest {
     public void assemble_AllColorsTheSame_NoPointsFound() {
         checkChangedPoints(
                 new MockMutableFrameGroup(
-                        new MockMutableFrameView(0, new Color(10, 10, 10, 10)),
-                        new MockMutableFrameView(1, new Color(10, 10, 10, 10)),
-                        new MockMutableFrameView(2, new Color(10, 10, 10, 10))
+                        new MockMutableFrameView(0, Color.pack(10, 10, 10, 10)),
+                        new MockMutableFrameView(1, Color.pack(10, 10, 10, 10)),
+                        new MockMutableFrameView(2, Color.pack(10, 10, 10, 10))
                 ),
                 Set.of()
         );
@@ -189,7 +189,7 @@ public class AnimationComponentProviderTest {
         );
     }
 
-    private static void checkChangedPoints(FrameGroup<MutableFrameView> frameGroup, Set<Point> expectedPoints) {
+    private static void checkChangedPoints(FrameGroup<MutableFrameView> frameGroup, Set<Long> expectedPoints) {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
@@ -199,12 +199,12 @@ public class AnimationComponentProviderTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        Set<Point> changedPoints = new HashSet<>();
-        Set<Color> nonInterpolatedColors = Set.of(
-                new Color(0, 0, 0, 0),
-                new Color(10, 10, 10, 10),
-                new Color(20, 20, 20, 20),
-                new Color(30, 30, 30, 30)
+        Set<Long> changedPoints = new HashSet<>();
+        Set<Integer> nonInterpolatedColors = Set.of(
+                Color.pack(0, 0, 0, 0),
+                Color.pack(10, 10, 10, 10),
+                Color.pack(20, 20, 20, 20),
+                Color.pack(30, 30, 30, 30)
         );
         for (int frame = 0; frame < frameGroup.frames(); frame++) {
             for (int tick = 0; tick < time; tick++) {
@@ -213,7 +213,7 @@ public class AnimationComponentProviderTest {
                 for (int y = 0; y < currentFrameView.height(); y++) {
                     for (int x = 0; x < currentFrameView.width(); x++) {
                         if (!nonInterpolatedColors.contains(currentFrameView.color(x, y))) {
-                            changedPoints.add(new Point(x, y));
+                            changedPoints.add(Point.pack(x, y));
                         }
                     }
                 }

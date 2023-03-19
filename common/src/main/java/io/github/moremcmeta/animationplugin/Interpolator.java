@@ -1,7 +1,5 @@
 package io.github.moremcmeta.animationplugin;
 
-import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
-
 /**
  * Interpolates between two colors.
  * @author soir20
@@ -16,6 +14,6 @@ public interface Interpolator {
      * @param end       color to end interpolation at
      * @return  the interpolated color at the given step
      */
-    Color interpolate(int steps, int step, Color start, Color end);
+    int interpolate(int steps, int step, int start, int end);
 
 }

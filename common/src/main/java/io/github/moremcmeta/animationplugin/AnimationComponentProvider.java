@@ -9,6 +9,7 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
+import io.github.moremcmeta.moremcmeta.api.math.Point;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 import java.util.Optional;
@@ -109,24 +110,24 @@ public class AnimationComponentProvider implements ComponentProvider {
 
         // For every point in the first frame, check that point in the other frames
         firstFrame.transform(
-                (overwritePoint, dependencyFunction) -> {
-                    Color firstColor = dependencyFunction.apply(overwritePoint);
+                (overwriteX, overwriteY, dependencyFunction) -> {
+                    int firstColor = dependencyFunction.color(overwriteX, overwriteY);
 
                     // Check the point in each of the other frames
                     AtomicBoolean isDifferent = new AtomicBoolean();
                     for (int frameIndex = 1; frameIndex < frames.frames(); frameIndex++) {
                         frames.frame(frameIndex).transform(
-                                (otherOverwritePoint, otherDependencyFunction) -> {
-                                    Color otherColor = otherDependencyFunction.apply(otherOverwritePoint);
-                                    if (!firstColor.equalsOrBothInvisible(otherColor)) {
-                                        areaBuilder.addPixel(overwritePoint);
+                                (otherOverwriteX, otherOverwriteY, otherDependencyFunction) -> {
+                                    int otherColor = otherDependencyFunction.color(otherOverwriteX, otherOverwriteY);
+                                    if (!Color.equalsOrBothInvisible(firstColor, otherColor)) {
+                                        areaBuilder.addPixel(overwriteX, overwriteY);
                                         isDifferent.set(true);
                                     }
 
-                                    return otherDependencyFunction.apply(otherOverwritePoint);
+                                    return otherDependencyFunction.color(otherOverwriteX, otherOverwriteY);
                                 },
-                                Area.of(overwritePoint),
-                                Area.of(overwritePoint)
+                                Area.of(Point.pack(overwriteX, overwriteY)),
+                                Area.of(Point.pack(overwriteX, overwriteY))
                         );
 
                         // If a different point is found, checking the other frames is unnecessary
@@ -136,7 +137,7 @@ public class AnimationComponentProvider implements ComponentProvider {
 
                     }
 
-                    return dependencyFunction.apply(overwritePoint);
+                    return dependencyFunction.color(overwriteX, overwriteY);
                 },
                 fullFrameArea,
                 fullFrameArea
