@@ -19,6 +19,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class AnimationComponent implements TextureComponent<CurrentFrameView, UploadableFrameView> {
     private final AnimationState STATE;
+    private final int TICKS_UNTIL_START;
     private final IntUnaryOperator FRAME_INDEX_MAPPER;
     private final Interpolator INTERPOLATOR;
     private final Area INTERPOLATE_AREA;
@@ -29,18 +30,20 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
      * Creates a new animation component for an animation that is synchronized to the level time.
      * @param interpolateArea           pixels to interpolate/modify during the animation
      * @param frames                    number of predefined frames in the animation
+     * @param ticksUntilStart           ticks between the first tick in the first frame and the start of the animation
      * @param frameTimeCalculator       calculates the duration of each frame in ticks
      * @param frameIndexMapper          maps frame indices to the index of the corresponding predefined frame
      * @param interpolator              interpolates between colors
      * @param syncTicks                 number of ticks to sync to; e.g. 24000 to sync to a Minecraft day
      * @param timeGetter                retrieves the current time in the world, if any
      */
-    public AnimationComponent(Area interpolateArea, int frames, IntUnaryOperator frameTimeCalculator,
-                              IntUnaryOperator frameIndexMapper, Interpolator interpolator, int syncTicks,
-                              Supplier<Optional<Long>> timeGetter) {
+    public AnimationComponent(Area interpolateArea, int frames, int ticksUntilStart,
+                              IntUnaryOperator frameTimeCalculator, IntUnaryOperator frameIndexMapper,
+                              Interpolator interpolator, int syncTicks, Supplier<Optional<Long>> timeGetter) {
         this(
                 interpolateArea,
                 frames,
+                ticksUntilStart,
                 frameTimeCalculator,
                 frameIndexMapper,
                 interpolator,
@@ -54,15 +57,18 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
      * Creates a new animation component for an animation that is not synchronized to the level time.
      * @param interpolateArea           pixels to interpolate/modify during the animation
      * @param frames                    number of predefined frames in the animation
+     * @param ticksUntilStart           ticks between the first tick in the first frame and the start of the animation
      * @param frameTimeCalculator       calculates the duration of each frame in ticks
      * @param frameIndexMapper          maps frame indices to the index of the corresponding predefined frame
      * @param interpolator              interpolates between colors
      */
-    public AnimationComponent(Area interpolateArea, int frames, IntUnaryOperator frameTimeCalculator,
-                              IntUnaryOperator frameIndexMapper, Interpolator interpolator) {
+    public AnimationComponent(Area interpolateArea, int frames, int ticksUntilStart,
+                              IntUnaryOperator frameTimeCalculator, IntUnaryOperator frameIndexMapper,
+                              Interpolator interpolator) {
         this(
                 interpolateArea,
                 frames,
+                ticksUntilStart,
                 frameTimeCalculator,
                 frameIndexMapper,
                 interpolator,
@@ -78,7 +84,7 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
 
         if (timeOptional.isPresent()) {
             long currentTime = timeOptional.get();
-            int ticksToAdd = Math.floorMod(currentTime - STATE.ticks(), SYNC_TICKS);
+            int ticksToAdd = Math.floorMod(currentTime - STATE.ticks(), SYNC_TICKS) + TICKS_UNTIL_START;
 
             STATE.tick(ticksToAdd);
         } else {
@@ -109,6 +115,7 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
      * Creates a new animation component.
      * @param interpolateArea           pixels to interpolate/modify during the animation
      * @param frames                    number of predefined frames in the animation
+     * @param ticksUntilStart           ticks between the first tick in the first frame and the start of the animation
      * @param frameTimeCalculator       calculates the duration of each frame in ticks
      * @param frameIndexMapper          maps frame indices to the index of the corresponding predefined frame
      * @param interpolator              interpolates between colors
@@ -116,11 +123,19 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
      * @param timeGetter                retrieves the current time in the world, if any
      * @param allowNegativeSyncTicks    whether sync ticks can be negative; true when the animation is not synchronized
      */
-    private AnimationComponent(Area interpolateArea, int frames, IntUnaryOperator frameTimeCalculator,
-                               IntUnaryOperator frameIndexMapper, Interpolator interpolator, int syncTicks,
-                               Supplier<Optional<Long>> timeGetter, boolean allowNegativeSyncTicks) {
+    private AnimationComponent(Area interpolateArea, int frames, int ticksUntilStart,
+                               IntUnaryOperator frameTimeCalculator, IntUnaryOperator frameIndexMapper,
+                               Interpolator interpolator, int syncTicks, Supplier<Optional<Long>> timeGetter,
+                               boolean allowNegativeSyncTicks) {
         requireNonNull(frameTimeCalculator, "Frame time calculator cannot be null");
         STATE = new AnimationState(frames, frameTimeCalculator);
+
+        if (ticksUntilStart < 0) {
+            throw new IllegalArgumentException("Ticks until start cannot be negative but was: " + ticksUntilStart);
+        }
+        TICKS_UNTIL_START = ticksUntilStart;
+        STATE.tick(TICKS_UNTIL_START);
+
         FRAME_INDEX_MAPPER = requireNonNull(frameIndexMapper, "Frame index mapper cannot be null");
 
         INTERPOLATOR = requireNonNull(interpolator, "Interpolator cannot be null");

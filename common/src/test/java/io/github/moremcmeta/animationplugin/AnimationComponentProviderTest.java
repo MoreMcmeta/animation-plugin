@@ -65,7 +65,7 @@ public class AnimationComponentProviderTest {
     public void assemble_NullFrameGroup_NullPointerException() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         expectedException.expect(NullPointerException.class);
-        provider.assemble(new AnimationMetadata(10, 20, 10, true, LARGE_MOCK_FRAME_LIST, true), null);
+        provider.assemble(new AnimationMetadata(10, 20, 10, true, LARGE_MOCK_FRAME_LIST, 0, true), null);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, time, true, List.of(), false),
+                new AnimationMetadata(10, 20, time, true, List.of(), 0, false),
                 MOCK_FRAME_GROUP
         );
 
@@ -99,7 +99,7 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, LARGE_MOCK_FRAME_LIST, false),
+                new AnimationMetadata(10, 20, 33, true, LARGE_MOCK_FRAME_LIST, 0, false),
                 MOCK_FRAME_GROUP
         );
 
@@ -122,7 +122,7 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, SMALL_MOCK_FRAME_LIST, false),
+                new AnimationMetadata(10, 20, 33, true, SMALL_MOCK_FRAME_LIST, 0, false),
                 MOCK_FRAME_GROUP
         );
 
@@ -145,7 +145,7 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, time, true, List.of(), true),
+                new AnimationMetadata(10, 20, time, true, List.of(), 0, true),
                 MOCK_FRAME_GROUP
         );
 
@@ -164,7 +164,7 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, LARGE_MOCK_FRAME_LIST, true),
+                new AnimationMetadata(10, 20, 33, true, LARGE_MOCK_FRAME_LIST, 0, true),
                 MOCK_FRAME_GROUP
         );
 
@@ -187,7 +187,7 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, SMALL_MOCK_FRAME_LIST, true),
+                new AnimationMetadata(10, 20, 33, true, SMALL_MOCK_FRAME_LIST, 0, true),
                 MOCK_FRAME_GROUP
         );
 
@@ -250,7 +250,7 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
         TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, time, true, List.of(), false),
+                new AnimationMetadata(10, 20, time, true, List.of(), 0, false),
                 frameGroup
         );
 

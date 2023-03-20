@@ -529,6 +529,35 @@ public class AnimationMetadataParserTest {
     }
 
     @Test
+    public void parse_ZeroSkipTicks_UsesProvidedTicks() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of("skip", 0)))
+        );
+        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
+
+        assertEquals(0, metadata.skipTicks());
+    }
+
+    @Test
+    public void parse_NegativeSkipTicks_InvalidMetadataException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of("skip", -1)))
+        );
+        expectedException.expect(InvalidMetadataException.class);
+        PARSER.parse(metadataView, 10, 20);
+    }
+
+    @Test
+    public void parse_PositiveSkipTicks_UsesProvidedTicks() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of("skip", 7)))
+        );
+        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
+
+        assertEquals(7, metadata.skipTicks());
+    }
+
+    @Test
     public void parse_AllFieldsPresent_AllUsed() throws InvalidMetadataException {
         MetadataView metadataView = new MockMetadataView(
                 ImmutableMap.of(
@@ -544,7 +573,8 @@ public class AnimationMetadataParserTest {
                                         "0", new MockMetadataView(ImmutableMap.of("index", 5, "time", 12)),
                                         "1", 2,
                                         "2", new MockMetadataView(ImmutableMap.of("index", 0, "time", 7))
-                                ))
+                                )),
+                                "skip", 12
                         ))
                 )
         );
@@ -553,6 +583,7 @@ public class AnimationMetadataParserTest {
         assertEquals(18, (int) metadata.frameWidth().orElseThrow());
         assertEquals(27, (int) metadata.frameHeight().orElseThrow());
         assertEquals(5, metadata.defaultTime());
+        assertEquals(12, metadata.skipTicks());
         assertTrue(metadata.interpolate());
         assertFalse(metadata.daytimeSync());
         assertEquals(

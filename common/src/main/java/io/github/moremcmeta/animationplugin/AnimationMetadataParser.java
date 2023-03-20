@@ -51,7 +51,20 @@ public class AnimationMetadataParser implements MetadataParser {
             frames = ImmutableList.of();
         }
 
-        return new AnimationMetadata(frameWidth, frameHeight, defaultTime, interpolate, frames, daytimeSync);
+        int skipTicks = sectionMetadata.integerValue("skip").orElse(0);
+        if (skipTicks < 0) {
+            throw new InvalidMetadataException("Skip ticks cannot be negative but was: " + skipTicks);
+        }
+
+        return new AnimationMetadata(
+                frameWidth,
+                frameHeight,
+                defaultTime,
+                interpolate,
+                frames,
+                skipTicks,
+                daytimeSync
+        );
     }
 
     /**

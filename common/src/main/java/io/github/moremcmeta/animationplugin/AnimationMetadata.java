@@ -19,6 +19,7 @@ public class AnimationMetadata implements ParsedMetadata {
     private final int DEFAULT_TIME;
     private final boolean INTERPOLATE;
     private final ImmutableList<IntIntPair> FRAMES;
+    private final int SKIP_TICKS;
     private final boolean DAYTIME_SYNC;
 
     /**
@@ -28,15 +29,17 @@ public class AnimationMetadata implements ParsedMetadata {
      * @param defaultTime       default time for a frame in the animation
      * @param interpolate       whether to interpolate frames in the animation
      * @param frames            frames in the animation
+     * @param skipTicks         ticks to skip before the animation starts
      * @param daytimeSync       whether to synchronize the animation to the time of day
      */
     public AnimationMetadata(int frameWidth, int frameHeight, int defaultTime, boolean interpolate,
-                             List<IntIntPair> frames, boolean daytimeSync) {
+                             List<IntIntPair> frames, int skipTicks, boolean daytimeSync) {
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
         DEFAULT_TIME = defaultTime;
         INTERPOLATE = interpolate;
         FRAMES = requireNonNull(ImmutableList.copyOf(frames), "Frames cannot be null");
+        SKIP_TICKS = skipTicks;
         DAYTIME_SYNC = daytimeSync;
     }
 
@@ -73,6 +76,14 @@ public class AnimationMetadata implements ParsedMetadata {
      */
     public ImmutableList<IntIntPair> predefinedFrames() {
         return FRAMES;
+    }
+
+    /**
+     * Gets the number of ticks to skip before the animation starts.
+     * @return number of ticks to skip before the animation starts
+     */
+    public int skipTicks() {
+        return SKIP_TICKS;
     }
 
     /**

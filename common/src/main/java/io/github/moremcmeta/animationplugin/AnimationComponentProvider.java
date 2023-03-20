@@ -10,8 +10,10 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
+import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.client.multiplayer.ClientLevel;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntUnaryOperator;
@@ -50,29 +52,30 @@ public class AnimationComponentProvider implements ComponentProvider {
         }
 
         Area changedArea = animationMetadata.interpolate() ? findChangedArea(frames) : Area.of();
+        List<IntIntPair> predefinedFrames = animationMetadata.predefinedFrames();
 
         // Number of frames
         int frameCount = frames.frames();
-        if (!animationMetadata.predefinedFrames().isEmpty()) {
-            frameCount = animationMetadata.predefinedFrames().size();
+        if (!predefinedFrames.isEmpty()) {
+            frameCount = predefinedFrames.size();
         }
 
         // Frame time calculation
         IntUnaryOperator frameTimeCalculator = (index) -> {
-            if (animationMetadata.predefinedFrames().isEmpty()) {
+            if (predefinedFrames.isEmpty()) {
                 return animationMetadata.defaultTime();
             }
 
-            return animationMetadata.predefinedFrames().get(index).rightInt();
+            return predefinedFrames.get(index).rightInt();
         };
 
         // Index mapping
         IntUnaryOperator frameIndexMapper = (index) -> {
-            if (animationMetadata.predefinedFrames().isEmpty()) {
+            if (predefinedFrames.isEmpty()) {
                 return index;
             }
 
-            return animationMetadata.predefinedFrames().get(index).leftInt();
+            return predefinedFrames.get(index).leftInt();
         };
 
         // Time retrieval
@@ -93,6 +96,7 @@ public class AnimationComponentProvider implements ComponentProvider {
             return new AnimationComponent(
                     changedArea,
                     frameCount,
+                    animationMetadata.skipTicks(),
                     frameTimeCalculator,
                     frameIndexMapper,
                     interpolator,
@@ -103,6 +107,7 @@ public class AnimationComponentProvider implements ComponentProvider {
         return new AnimationComponent(
                 changedArea,
                 frameCount,
+                animationMetadata.skipTicks(),
                 frameTimeCalculator,
                 frameIndexMapper,
                 interpolator
