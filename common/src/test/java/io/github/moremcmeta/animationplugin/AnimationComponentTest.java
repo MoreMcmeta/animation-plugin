@@ -24,92 +24,144 @@ public class AnimationComponentTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void construct_NotSyncedNullInterpolateArea_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new AnimationComponent(null, 5, 0, (frame) -> 10, (frame) -> frame, INTERPOLATOR);
+    public void build_MissingInterpolateArea_IllegalStateException() {
+        expectedException.expect(IllegalStateException.class);
+        new AnimationComponent.Builder()
+                .frames(5)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .build();
     }
 
     @Test
-    public void construct_NotSyncedNullFrameTimeCalculator_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, 0, null, (frame) -> frame, INTERPOLATOR);
+    public void build_MissingFrames_IllegalStateException() {
+        expectedException.expect(IllegalStateException.class);
+        new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .build();
     }
 
     @Test
-    public void construct_NotSyncedNullIndexMapper_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, 0, (frame) -> 10, null, INTERPOLATOR);
+    public void build_MissingTicksUntilStart_IllegalStateException() {
+        expectedException.expect(IllegalStateException.class);
+        new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(5)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .build();
     }
 
     @Test
-    public void construct_NotSyncedNullInterpolator_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, 0, (frame) -> 10, (frame) -> frame, null);
+    public void build_MissingFrameTimeCalculator_IllegalStateException() {
+        expectedException.expect(IllegalStateException.class);
+        new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(5)
+                .ticksUntilStart(0)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .build();
     }
 
     @Test
-    public void construct_NotSyncedNegativeSkipTicks_IllegalArgException() {
+    public void build_MissingFrameIndexMapper_IllegalStateException() {
+        expectedException.expect(IllegalStateException.class);
+        new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(5)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .interpolator(INTERPOLATOR)
+                .build();
+    }
+
+    @Test
+    public void build_MissingInterpolator_IllegalStateException() {
+        expectedException.expect(IllegalStateException.class);
+        new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(5)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .build();
+    }
+
+    @Test
+    public void build_NullInterpolateArea_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationComponent.Builder().interpolateArea(null);
+    }
+
+    @Test
+    public void build_NullFrameTimeCalculator_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationComponent.Builder().frameTimeCalculator(null);
+    }
+
+    @Test
+    public void build_NullIndexMapper_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationComponent.Builder().frameIndexMapper(null);
+    }
+
+    @Test
+    public void build_NullInterpolator_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationComponent.Builder().interpolator(null);
+    }
+
+    @Test
+    public void build_NullTimeGetter_NullPointerException() {
+        expectedException.expect(NullPointerException.class);
+        new AnimationComponent.Builder().syncTicks(10, null);
+    }
+
+    @Test
+    public void build_NegativeFrames_IllegalArgException() {
         expectedException.expect(IllegalArgumentException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, -1, (frame) -> 10, (frame) -> frame, INTERPOLATOR);
+        new AnimationComponent.Builder().frames(-1);
     }
 
     @Test
-    public void construct_SyncedNullInterpolateArea_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new AnimationComponent(null, 5, 0, (frame) -> 10, (frame) -> frame, INTERPOLATOR,
-                24000, () -> Optional.of(10L));
-    }
-
-    @Test
-    public void construct_SyncedNullFrameTimeCalculator_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, 0, null, (frame) -> frame, INTERPOLATOR,
-                24000, () -> Optional.of(10L));
-    }
-
-    @Test
-    public void construct_SyncedNullIndexMapper_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, 0, (frame) -> 10, null, INTERPOLATOR,
-                24000, () -> Optional.of(10L));
-    }
-
-    @Test
-    public void construct_SyncedNullInterpolator_NullPointerException() {
-        expectedException.expect(NullPointerException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, 0, (frame) -> 10, (frame) -> frame, null,
-                24000, () -> Optional.of(10L));
-    }
-
-    @Test
-    public void construct_SyncedNegativeTicks_IllegalArgException() {
-        AtomicLong currentTime = new AtomicLong(800);
+    public void build_ZeroFrames_IllegalArgException() {
         expectedException.expect(IllegalArgumentException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, 0, (frame) -> 10, (frame) -> frame, INTERPOLATOR,
-                -1, () -> Optional.of(currentTime.incrementAndGet()));
+        new AnimationComponent.Builder().frames(-1);
     }
 
     @Test
-    public void construct_SyncedZeroTicks_IllegalArgException() {
-        AtomicLong currentTime = new AtomicLong(800);
+    public void build_NegativeSkipTicks_IllegalArgException() {
         expectedException.expect(IllegalArgumentException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, 0, (frame) -> 10, (frame) -> frame, INTERPOLATOR,
-                0, () -> Optional.of(currentTime.incrementAndGet()));
+        new AnimationComponent.Builder().ticksUntilStart(-1);
     }
 
     @Test
-    public void construct_SyncedNegativeSkipTicks_IllegalArgException() {
-        AtomicLong currentTime = new AtomicLong(800);
+    public void build_NegativeSyncTicks_IllegalArgException() {
         expectedException.expect(IllegalArgumentException.class);
-        new AnimationComponent(Area.of(Point.pack(0, 0)), 5, -1, (frame) -> 10, (frame) -> frame, INTERPOLATOR,
-                24000, () -> Optional.of(currentTime.incrementAndGet()));
+        new AnimationComponent.Builder().syncTicks(-1, () -> Optional.of(5L));
     }
 
     @Test
     @SuppressWarnings("OptionalAssignedToNull")
     public void tick_SyncedTimeGetterReturnsNull_NullPointerException() {
-        AnimationComponent component = new AnimationComponent(Area.of(Point.pack(0, 0)), 5, 0, (frame) -> 10,
-                (frame) -> frame, INTERPOLATOR, 375, () -> null);
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(5)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(375, () -> null)
+                .build();
+
         expectedException.expect(NullPointerException.class);
         component.onTick(new MockCurrentFrameView(), new MockPersistentFrameGroup(5));
     }
@@ -119,14 +171,14 @@ public class AnimationComponentTest {
         int frames = 10;
         int animationLength = 550;
         AtomicInteger tick = new AtomicInteger(0);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                0,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -140,14 +192,14 @@ public class AnimationComponentTest {
     @Test
     public void tick_NotSyncedPartWay_CorrectAnimFrame() {
         int frames = 10;
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                0,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -165,14 +217,14 @@ public class AnimationComponentTest {
     @Test
     public void tick_NotSyncedPartWayWithSkipTicksLessThanFirstFrameLength_CorrectAnimFrame() {
         int frames = 10;
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                5,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(5)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -190,14 +242,14 @@ public class AnimationComponentTest {
     @Test
     public void tick_NotSyncedPartWayWithSkipTicksMoreThanFirstFrameLength_CorrectAnimFrame() {
         int frames = 10;
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                15,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(15)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -216,16 +268,15 @@ public class AnimationComponentTest {
     public void tick_SyncsToSameLoopInitialTime_SameAnimFrame() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(800);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                0,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                800,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(800, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -241,16 +292,15 @@ public class AnimationComponentTest {
     public void tick_SyncsToSameNegativeInitialTime_SameAnimFrame() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(-1);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                0,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                800,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(800, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -266,16 +316,15 @@ public class AnimationComponentTest {
     public void tick_SyncsForward_FrameAtTime() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(375);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                0,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                800,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(800, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -291,16 +340,15 @@ public class AnimationComponentTest {
     public void tick_SyncsBackward_FrameAtTime() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(-375);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                0,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                800,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(800, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -316,16 +364,15 @@ public class AnimationComponentTest {
     public void tick_SyncsForwardWithSkipTicksLessThanFirstFrameLength_FrameAtTime() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(375);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                5,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                800,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(5)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(800, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -341,16 +388,15 @@ public class AnimationComponentTest {
     public void tick_SyncsForwardWithSkipTicksMoreThanFirstFrameLength_FrameAtTime() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(375);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                15,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                800,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(15)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(800, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -366,16 +412,15 @@ public class AnimationComponentTest {
     public void tick_SyncsBackwardWithSkipTicksLessThanFirstFrameLength_FrameAtTime() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(-375);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                5,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                800,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(5)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(800, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -391,16 +436,15 @@ public class AnimationComponentTest {
     public void tick_SyncsBackwardWithSkipTicksMoreThanFirstFrameLength_FrameAtTime() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(-375);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                15,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                800,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(15)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(800, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -416,16 +460,15 @@ public class AnimationComponentTest {
     public void tick_VeryLargeSyncTicks_FrameAtTime() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(375);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                0,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                Integer.MAX_VALUE,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(Integer.MAX_VALUE, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
@@ -441,16 +484,15 @@ public class AnimationComponentTest {
     public void tick_VeryLargeTime_FrameAtTime() {
         int frames = 10;
         AtomicLong currentTime = new AtomicLong(Long.MAX_VALUE);
-        AnimationComponent component = new AnimationComponent(
-                Area.of(Point.pack(0, 0)),
-                frames,
-                0,
-                (frame) -> (frame + 1) * 10,
-                (frame) -> frame,
-                INTERPOLATOR,
-                800,
-                () -> Optional.of(currentTime.incrementAndGet())
-        );
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .syncTicks(800, () -> Optional.of(currentTime.incrementAndGet()))
+                .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 

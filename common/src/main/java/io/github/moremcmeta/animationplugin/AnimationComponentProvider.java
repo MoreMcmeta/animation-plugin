@@ -92,26 +92,19 @@ public class AnimationComponentProvider implements ComponentProvider {
 
         Interpolator interpolator = new RGBAInterpolator();
 
+        AnimationComponent.Builder componentBuilder = new AnimationComponent.Builder();
+        componentBuilder.interpolateArea(changedArea)
+                .frames(frameCount)
+                .ticksUntilStart(animationMetadata.skipTicks())
+                .frameTimeCalculator(frameTimeCalculator)
+                .frameIndexMapper(frameIndexMapper)
+                .interpolator(interpolator);
+
         if (animationMetadata.daytimeSync()) {
-            return new AnimationComponent(
-                    changedArea,
-                    frameCount,
-                    animationMetadata.skipTicks(),
-                    frameTimeCalculator,
-                    frameIndexMapper,
-                    interpolator,
-                    TICKS_PER_DAY,
-                    timeGetter);
+            componentBuilder.syncTicks(TICKS_PER_DAY, timeGetter);
         }
 
-        return new AnimationComponent(
-                changedArea,
-                frameCount,
-                animationMetadata.skipTicks(),
-                frameTimeCalculator,
-                frameIndexMapper,
-                interpolator
-        );
+        return componentBuilder.build();
     }
 
     /**
