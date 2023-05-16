@@ -695,7 +695,7 @@ public class AnimationMetadataParserTest {
     }
 
     @Test
-    public void parse_UploadTopLeftInBounds_NoException() throws InvalidMetadataException {
+    public void parse_UploadPerfectFit_NoException() throws InvalidMetadataException {
         MetadataView metadataView = new MockMetadataView(
                 ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
                         "base", "minecraft:textures/test.png",
@@ -715,6 +715,253 @@ public class AnimationMetadataParserTest {
         assertEquals(handles, metadata.bases());
         assertEquals(0, metadata.uploadX());
         assertEquals(0, metadata.uploadY());
+    }
+
+    @Test
+    public void parse_UploadNonZeroMinXY_NoException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "minecraft:textures/test.png",
+                        "x", 0,
+                        "y", 0
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 5, 2, 10, 10));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("minecraft:textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+        AnimationMetadata metadata = (AnimationMetadata) parser.parse(metadataView, 10, 20);
+
+        assertEquals(handles, metadata.bases());
+        assertEquals(0, metadata.uploadX());
+        assertEquals(0, metadata.uploadY());
+    }
+
+    @Test
+    public void parse_UploadTopLeftInBounds_NoException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "minecraft:textures/test.png",
+                        "x", 0,
+                        "y", 0
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 0, 0, 15, 15));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("minecraft:textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+        AnimationMetadata metadata = (AnimationMetadata) parser.parse(metadataView, 10, 20);
+
+        assertEquals(handles, metadata.bases());
+        assertEquals(0, metadata.uploadX());
+        assertEquals(0, metadata.uploadY());
+    }
+
+    @Test
+    public void parse_UploadTopRightInBounds_NoException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "minecraft:textures/test.png",
+                        "x", 5,
+                        "y", 0
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 0, 0, 15, 15));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("minecraft:textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+        AnimationMetadata metadata = (AnimationMetadata) parser.parse(metadataView, 10, 20);
+
+        assertEquals(handles, metadata.bases());
+        assertEquals(5, metadata.uploadX());
+        assertEquals(0, metadata.uploadY());
+    }
+
+    @Test
+    public void parse_UploadBottomLeftInBounds_NoException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "minecraft:textures/test.png",
+                        "x", 0,
+                        "y", 5
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 0, 0, 15, 15));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("minecraft:textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+        AnimationMetadata metadata = (AnimationMetadata) parser.parse(metadataView, 10, 20);
+
+        assertEquals(handles, metadata.bases());
+        assertEquals(0, metadata.uploadX());
+        assertEquals(5, metadata.uploadY());
+    }
+
+    @Test
+    public void parse_UploadBottomRightInBounds_NoException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "minecraft:textures/test.png",
+                        "x", 5,
+                        "y", 5
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 0, 0, 15, 15));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("minecraft:textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+        AnimationMetadata metadata = (AnimationMetadata) parser.parse(metadataView, 10, 20);
+
+        assertEquals(handles, metadata.bases());
+        assertEquals(5, metadata.uploadX());
+        assertEquals(5, metadata.uploadY());
+    }
+
+    @Test
+    public void parse_UploadBottomOutOfBounds_InvalidMetadataException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "minecraft:textures/test.png",
+                        "x", 0,
+                        "y", 6
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 0, 0, 15, 15));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("minecraft:textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        parser.parse(metadataView, 10, 20);
+    }
+
+    @Test
+    public void parse_UploadRightOutOfBounds_InvalidMetadataException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "minecraft:textures/test.png",
+                        "x", 6,
+                        "y", 0
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 0, 0, 15, 15));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("minecraft:textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        parser.parse(metadataView, 10, 20);
+    }
+
+    @Test
+    public void parse_UploadRightOnlyOneTextureOutOfBounds_InvalidMetadataException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "minecraft:textures/test.png",
+                        "x", 6,
+                        "y", 0
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(
+                new TextureHandle(() -> {}, 0, 0, 100, 50), // in bounds
+                new TextureHandle(() -> {}, 0, 0, 15, 15),  // out of bounds
+                new TextureHandle(() -> {}, 0, 0, 20, 30)   // in bounds
+        );
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("minecraft:textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        parser.parse(metadataView, 10, 20);
+    }
+
+    @Test
+    public void parse_BaseNoNamespace_NoException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "textures/test.png",
+                        "x", 0,
+                        "y", 0
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 0, 0, 10, 10));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+        AnimationMetadata metadata = (AnimationMetadata) parser.parse(metadataView, 10, 20);
+
+        assertEquals(handles, metadata.bases());
+        assertEquals(0, metadata.uploadX());
+        assertEquals(0, metadata.uploadY());
+    }
+
+    @Test
+    public void parse_BaseInvalidNamespace_InvalidMetadataException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "m!necraft:textures/test.png",
+                        "x", 0,
+                        "y", 0
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 0, 0, 10, 10));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        parser.parse(metadataView, 10, 20);
+    }
+
+    @Test
+    public void parse_BaseInvalidPath_InvalidMetadataException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of("animation", new MockMetadataView(ImmutableMap.of(
+                        "base", "minecraft:tex+ures/test.png",
+                        "x", 0,
+                        "y", 0
+                )))
+        );
+        Collection<TextureHandle> handles = ImmutableList.of(new TextureHandle(() -> {}, 0, 0, 10, 10));
+        AnimationMetadataParser parser = new AnimationMetadataParser((location) ->
+                ImmutableMap.of(
+                        new ResourceLocation("textures/test.png"),
+                        handles
+                ).getOrDefault(location, ImmutableList.of())
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        parser.parse(metadataView, 10, 20);
     }
 
     @Test
