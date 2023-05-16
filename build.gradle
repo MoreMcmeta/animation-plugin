@@ -15,14 +15,14 @@ subprojects {
     }
 
     configurations {
-        testImplementation.extendsFrom modCompileOnly
+        modLocalRuntime.extendsFrom modCompileOnly
     }
 
     dependencies {
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
         mappings loom.officialMojangMappings()
 
-        modImplementation "io.github.moremcmeta:moremcmeta-${project.name}:${project.moremcmeta_version}"
+        modCompileOnly "io.github.moremcmeta:moremcmeta-${project.name}:${project.moremcmeta_version}"
 
         testImplementation "junit:junit:${project.junit_version}"
     }
