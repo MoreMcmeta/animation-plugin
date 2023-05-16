@@ -22,7 +22,7 @@ subprojects {
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
         mappings loom.officialMojangMappings()
 
-        modCompileOnly "io.github.moremcmeta:moremcmeta-${project.name}:${project.moremcmeta_version}"
+        modImplementation "io.github.moremcmeta:moremcmeta-${project.name}:${project.moremcmeta_version}"
 
         testImplementation "junit:junit:${project.junit_version}"
     }
