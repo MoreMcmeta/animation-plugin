@@ -5,10 +5,16 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataExcept
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.resources.ResourceLocation;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,6 +23,15 @@ import static java.util.Objects.requireNonNull;
  * @author soir20
  */
 public class AnimationMetadataParser implements MetadataParser {
+    private final Function<ResourceLocation, ? extends Collection<TextureHandle>> TEXTURE_LOOKUP;
+
+    /**
+     * Creates a new metadata parser.
+     * @param textureLookup     function to lookup textures by their location
+     */
+    public AnimationMetadataParser(Function<ResourceLocation, ? extends Collection<TextureHandle>> textureLookup) {
+        TEXTURE_LOOKUP = requireNonNull(textureLookup, "Texture lookup cannot be null");
+    }
 
     @Override
     public ParsedMetadata parse(MetadataView metadata, int imageWidth, int imageHeight) throws InvalidMetadataException {
@@ -51,6 +66,19 @@ public class AnimationMetadataParser implements MetadataParser {
             frames = ImmutableList.of();
         }
 
+        Collection<TextureHandle> base = ImmutableList.of();
+        int uploadX = 0;
+        int uploadY = 0;
+        Optional<String> baseLocation = sectionMetadata.stringValue("base");
+        if (baseLocation.isPresent()) {
+            base = TEXTURE_LOOKUP.apply(parseResourceLocation(baseLocation.get()));
+            uploadX = sectionMetadata.integerValue("x")
+                    .orElseThrow(() -> new InvalidMetadataException("Base defined without x upload coordinate"));
+            uploadY = sectionMetadata.integerValue("y")
+                    .orElseThrow(() -> new InvalidMetadataException("Base defined without y upload coordinate"));
+            validateAnimationInBounds(base, uploadX, uploadY, frameWidth, frameHeight);
+        }
+
         int skipTicks = sectionMetadata.integerValue("skip").orElse(0);
         if (skipTicks < 0) {
             throw new InvalidMetadataException("Skip ticks cannot be negative but was: " + skipTicks);
@@ -62,6 +90,9 @@ public class AnimationMetadataParser implements MetadataParser {
                 defaultTime,
                 interpolate,
                 frames,
+                base,
+                uploadX,
+                uploadY,
                 skipTicks,
                 daytimeSync
         );
@@ -114,6 +145,43 @@ public class AnimationMetadataParser implements MetadataParser {
         }
 
         return IntIntPair.of(index, frameTime);
+    }
+
+    /**
+     * Parses a string into a {@link ResourceLocation}.
+     * @param location      string to convert to a resource location
+     * @return resource location based on the given string
+     * @throws InvalidMetadataException if the resource location contains invalid characters
+     */
+    private ResourceLocation parseResourceLocation(String location) throws InvalidMetadataException {
+        try {
+            return new ResourceLocation(location);
+        } catch (ResourceLocationException err) {
+            throw new InvalidMetadataException(err.getMessage());
+        }
+    }
+
+    /**
+     * Validates that an animation would be uploaded within the bounds of all of its base textures.
+     * @param handles           texture handles for all base textures
+     * @param uploadX           x-coordinate where the top left corner of the frame will be uploaded
+     * @param uploadY           y-coordinate where the top left corner of the frame will be uploaded
+     * @param frameWidth        width of the animation frame
+     * @param frameHeight       height of the animation frame
+     * @throws InvalidMetadataException if the animation would be uploaded out of bounds
+     */
+    private void validateAnimationInBounds(Collection<TextureHandle> handles, int uploadX, int uploadY,
+                                           int frameWidth, int frameHeight) throws InvalidMetadataException {
+        if (uploadX < 0 || uploadY < 0) {
+            throw new InvalidMetadataException("Upload x- and y-coordinates must be non-negative");
+        }
+
+        Predicate<TextureHandle> isOutOfBounds =
+                (handle) -> uploadX > handle.width() - frameWidth || uploadY > handle.height() - frameHeight;
+
+        if (handles.stream().anyMatch(isOutOfBounds)) {
+            throw new InvalidMetadataException("Animation would be outside texture bounds");
+        }
     }
 
 }
