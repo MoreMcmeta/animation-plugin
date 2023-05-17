@@ -675,7 +675,7 @@ public class AnimationMetadataParserTest {
     public void parse_BaseUploadXNegative_InvalidMetadataException() throws InvalidMetadataException {
         MetadataView metadataView = new MockMetadataView(
                 ImmutableMap.of("animation", new MockMetadataView(
-                        ImmutableMap.of("base", "minecraft:textures/test.png", "x", -3))
+                        ImmutableMap.of("base", "minecraft:textures/test.png", "x", -3, "y", 7))
                 )
         );
 
@@ -687,7 +687,7 @@ public class AnimationMetadataParserTest {
     public void parse_BaseUploadYNegative_InvalidMetadataException() throws InvalidMetadataException {
         MetadataView metadataView = new MockMetadataView(
                 ImmutableMap.of("animation", new MockMetadataView(
-                        ImmutableMap.of("base", "minecraft:textures/test.png", "y", -7))
+                        ImmutableMap.of("base", "minecraft:textures/test.png", "x", 3, "y", -7))
                 )
         );
 
