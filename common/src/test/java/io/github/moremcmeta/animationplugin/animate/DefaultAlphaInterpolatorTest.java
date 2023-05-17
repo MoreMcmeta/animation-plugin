@@ -1,11 +1,11 @@
-package io.github.moremcmeta.animationplugin;
+package io.github.moremcmeta.animationplugin.animate;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the {@link DefaultAlphaInterpolator}.

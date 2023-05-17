@@ -1,4 +1,4 @@
-package io.github.moremcmeta.animationplugin;
+package io.github.moremcmeta.animationplugin.animate;
 
 import org.junit.Rule;
 import org.junit.Test;

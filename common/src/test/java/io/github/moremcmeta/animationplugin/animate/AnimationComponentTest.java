@@ -1,6 +1,8 @@
-package io.github.moremcmeta.animationplugin;
+package io.github.moremcmeta.animationplugin.animate;
 
 import com.google.common.collect.ImmutableList;
+import io.github.moremcmeta.animationplugin.MockCurrentFrameView;
+import io.github.moremcmeta.animationplugin.MockPersistentFrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import io.github.moremcmeta.moremcmeta.api.math.Area;

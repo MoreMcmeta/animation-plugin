@@ -4,7 +4,7 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 
 import java.util.Optional;
 
-import static io.github.moremcmeta.animationplugin.AnimationComponentTest.indexToColor;
+import static io.github.moremcmeta.animationplugin.animate.AnimationComponentTest.indexToColor;
 
 /**
  * Mock implementation of {@link PersistentFrameView}.

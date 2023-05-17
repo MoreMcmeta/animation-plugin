@@ -1,4 +1,4 @@
-package io.github.moremcmeta.animationplugin;
+package io.github.moremcmeta.animationplugin.parse;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;

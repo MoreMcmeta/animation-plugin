@@ -1,5 +1,7 @@
 package io.github.moremcmeta.animationplugin;
 
+import io.github.moremcmeta.animationplugin.parse.AnimationComponentProvider;
+import io.github.moremcmeta.animationplugin.parse.AnimationMetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;

@@ -1,5 +1,10 @@
-package io.github.moremcmeta.animationplugin;
+package io.github.moremcmeta.animationplugin.parse;
 
+import io.github.moremcmeta.animationplugin.animate.AnimationComponent;
+import io.github.moremcmeta.animationplugin.animate.DefaultAlphaInterpolator;
+import io.github.moremcmeta.animationplugin.animate.Interpolator;
+import io.github.moremcmeta.animationplugin.animate.SmoothAlphaInterpolator;
+import io.github.moremcmeta.animationplugin.animate.WobbleFunction;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;

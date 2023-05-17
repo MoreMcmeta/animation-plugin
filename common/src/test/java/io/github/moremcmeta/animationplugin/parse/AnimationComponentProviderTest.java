@@ -1,7 +1,13 @@
-package io.github.moremcmeta.animationplugin;
+package io.github.moremcmeta.animationplugin.parse;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
+import io.github.moremcmeta.animationplugin.MockCurrentFrameView;
+import io.github.moremcmeta.animationplugin.MockMutableFrameGroup;
+import io.github.moremcmeta.animationplugin.MockMutableFrameView;
+import io.github.moremcmeta.animationplugin.MockPersistentFrameGroup;
+import io.github.moremcmeta.animationplugin.animate.DefaultAlphaInterpolator;
+import io.github.moremcmeta.animationplugin.animate.SmoothAlphaInterpolator;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
@@ -23,9 +29,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static io.github.moremcmeta.animationplugin.animate.AnimationComponentTest.indexToColor;
 import static org.junit.Assert.assertEquals;
-
-import static io.github.moremcmeta.animationplugin.AnimationComponentTest.indexToColor;
 import static org.junit.Assert.assertTrue;
 
 /**

@@ -1,6 +1,7 @@
-package io.github.moremcmeta.animationplugin;
+package io.github.moremcmeta.animationplugin.parse;
 
 import com.google.common.collect.ImmutableList;
+import io.github.moremcmeta.animationplugin.ModConstants;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;

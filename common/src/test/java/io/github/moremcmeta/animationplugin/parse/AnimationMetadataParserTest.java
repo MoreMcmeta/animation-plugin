@@ -1,7 +1,8 @@
-package io.github.moremcmeta.animationplugin;
+package io.github.moremcmeta.animationplugin.parse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.github.moremcmeta.animationplugin.MockMetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;

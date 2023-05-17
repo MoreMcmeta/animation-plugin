@@ -1,4 +1,4 @@
-package io.github.moremcmeta.animationplugin;
+package io.github.moremcmeta.animationplugin.animate;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;

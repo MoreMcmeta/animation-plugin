@@ -11,7 +11,7 @@ import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static io.github.moremcmeta.animationplugin.AnimationComponentTest.indexToColor;
+import static io.github.moremcmeta.animationplugin.animate.AnimationComponentTest.indexToColor;
 
 /**
  * Mock implementation of {@link CurrentFrameView}.
