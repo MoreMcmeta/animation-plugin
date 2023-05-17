@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
  * @author soir20
  */
 public class AnimationComponentTest {
-    private static final Interpolator INTERPOLATOR = new RGBAInterpolator();
+    private static final Interpolator INTERPOLATOR = new DefaultAlphaInterpolator();
     
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

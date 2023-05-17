@@ -90,7 +90,12 @@ public class AnimationComponentProvider implements ComponentProvider {
             return Optional.of(time);
         };
 
-        Interpolator interpolator = new RGBAInterpolator();
+        Interpolator interpolator;
+        if (animationMetadata.smoothAlpha()) {
+            interpolator = new SmoothAlphaInterpolator();
+        } else {
+            interpolator = new DefaultAlphaInterpolator();
+        }
 
         AnimationComponent.Builder componentBuilder = new AnimationComponent.Builder();
         componentBuilder.interpolateArea(changedArea)

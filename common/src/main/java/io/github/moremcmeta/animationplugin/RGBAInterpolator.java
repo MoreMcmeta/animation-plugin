@@ -7,7 +7,7 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
  * Color format: AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB in binary, stored as an integer (32 bits total)
  * @author soir20
  */
-public class RGBAInterpolator implements Interpolator {
+public abstract class RGBAInterpolator implements Interpolator {
 
     /**
      * Generates an interpolated color between two other colors.
@@ -27,6 +27,26 @@ public class RGBAInterpolator implements Interpolator {
     }
 
     /**
+     * Mixes the alpha component from two RGB colors.
+     * @param startProportion   proportion of start color to mix (1 - proportion of end color)
+     * @param startColor        value of the first color's component
+     * @param endColor          value of the second color's component
+     * @return the resultant mixed component
+     */
+    protected abstract int mixAlpha(double startProportion, int startColor, int endColor);
+
+    /**
+     * Mixes one component from two RGB colors.
+     * @param startProportion   proportion of start color to mix (1 - proportion of end color)
+     * @param startColor        value of the first color's component
+     * @param endColor          value of the second color's component
+     * @return  the resultant mixed component
+     */
+    protected int mixComponent(double startProportion, int startColor, int endColor) {
+        return (int) (startProportion * startColor + (1.0 - startProportion) * endColor);
+    }
+
+    /**
      * Mixes the colors of two pixels into a single color.
      * @param startProportion   proportion of start color to mix (1 - proportion of end color)
      * @param startColor        color of the first pixel
@@ -38,18 +58,7 @@ public class RGBAInterpolator implements Interpolator {
         int green = mixComponent(startProportion, Color.green(startColor), Color.green(endColor));
         int blue = mixComponent(startProportion, Color.blue(startColor), Color.blue(endColor));
 
-        return Color.pack(red, green, blue, Color.alpha(startColor));
-    }
-
-    /**
-     * Mixes one component from two RGB colors.
-     * @param startProportion   proportion of start color to mix (1 - proportion of end color)
-     * @param startColor        value of the first color's component
-     * @param endColor          value of the second color's component
-     * @return  the resultant mixed component
-     */
-    private int mixComponent(double startProportion, int startColor, int endColor) {
-        return (int) (startProportion * startColor + (1.0 - startProportion) * endColor);
+        return Color.pack(red, green, blue, mixAlpha(startProportion, startColor, endColor));
     }
 
 }

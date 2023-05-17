@@ -56,6 +56,7 @@ public class AnimationMetadataParser implements MetadataParser {
         }
 
         boolean interpolate = sectionMetadata.booleanValue("interpolate").orElse(false);
+        boolean smoothAlpha = sectionMetadata.booleanValue("smoothAlpha").orElse(false);
         boolean daytimeSync = sectionMetadata.booleanValue("daytimeSync").orElse(false);
 
         Optional<MetadataView> framesViewOptional = sectionMetadata.subView("frames");
@@ -89,6 +90,7 @@ public class AnimationMetadataParser implements MetadataParser {
                 frameHeight,
                 defaultTime,
                 interpolate,
+                smoothAlpha,
                 frames,
                 base,
                 uploadX,

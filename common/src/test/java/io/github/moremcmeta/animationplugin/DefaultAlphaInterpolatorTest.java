@@ -8,30 +8,30 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.*;
 
 /**
- * Tests the {@link RGBAInterpolator}.
+ * Tests the {@link DefaultAlphaInterpolator}.
  * @author soir20
  */
-public class RGBAInterpolatorTest {
+public class DefaultAlphaInterpolatorTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void interpolate_StepLessThanOne_IllegalArgException() {
-        RGBAInterpolator interpolator = new RGBAInterpolator();
+        DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
         expectedException.expect(IllegalArgumentException.class);
         interpolator.interpolate(10, 11, 0, 0);
     }
 
     @Test
     public void interpolate_StepEqualsSteps_IllegalArgException() {
-        RGBAInterpolator interpolator = new RGBAInterpolator();
+        DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
         expectedException.expect(IllegalArgumentException.class);
         interpolator.interpolate(10, 10, 0, 0);
     }
 
     @Test
     public void interpolate_StepGreaterThanSteps_IllegalArgException() {
-        RGBAInterpolator interpolator = new RGBAInterpolator();
+        DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
         expectedException.expect(IllegalArgumentException.class);
         interpolator.interpolate(10, 0, 0, 0);
     }
@@ -43,7 +43,7 @@ public class RGBAInterpolatorTest {
         int thirdColor = Color.pack(250, 25, 50, 60);
         int fourthColor = Color.pack(25, 50, 30, 200);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator();
+        DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
         assertEquals(firstColor, interpolator.interpolate(10, 1, firstColor, firstColor));
         assertEquals(secondColor, interpolator.interpolate(10, 3, secondColor, secondColor));
         assertEquals(thirdColor, interpolator.interpolate(10, 5, thirdColor, thirdColor));
@@ -62,7 +62,7 @@ public class RGBAInterpolatorTest {
         int thirdEndColor = Color.pack(25, 250, 50, 0);
         int fourthEndColor = Color.pack(150, 50, 100, 0);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator();
+        DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
 
         assertEquals(Color.pack(39, 64, 246, 0), interpolator.interpolate(10, 5, firstStartColor, firstEndColor));
         assertEquals(Color.pack(137, 137, 50, 0), interpolator.interpolate(10, 5, secondStartColor, secondEndColor));
@@ -82,7 +82,7 @@ public class RGBAInterpolatorTest {
         int thirdEndColor = Color.pack(0, 238, 24, 122);
         int fourthEndColor = Color.pack(93, 209, 60, 223);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator();
+        DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
 
         assertEquals(Color.pack(152, 150, 75, 197), interpolator.interpolate(10, 2, firstStartColor, firstEndColor));
         assertEquals(Color.pack(54, 223, 98, 100), interpolator.interpolate(10, 2, secondStartColor, secondEndColor));
@@ -102,7 +102,7 @@ public class RGBAInterpolatorTest {
         int thirdEndColor = Color.pack(0, 238, 24, 122);
         int fourthEndColor = Color.pack(93, 209, 60, 223);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator();
+        DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
 
         assertEquals(Color.pack(104, 162, 92, 197), interpolator.interpolate(10, 5, firstStartColor, firstEndColor));
         assertEquals(Color.pack(73, 187, 127, 100), interpolator.interpolate(10, 5, secondStartColor, secondEndColor));
@@ -122,7 +122,7 @@ public class RGBAInterpolatorTest {
         int thirdEndColor = Color.pack(0, 238, 24, 122);
         int fourthEndColor = Color.pack(93, 209, 60, 223);
 
-        RGBAInterpolator interpolator = new RGBAInterpolator();
+        DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
 
         assertEquals(Color.pack(56, 173, 108, 197), interpolator.interpolate(10, 8, firstStartColor, firstEndColor));
         assertEquals(Color.pack(93, 150, 155, 100), interpolator.interpolate(10, 8, secondStartColor, secondEndColor));

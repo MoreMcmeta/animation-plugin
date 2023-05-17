@@ -21,6 +21,7 @@ public class AnimationMetadata implements ParsedMetadata {
     private final int FRAME_HEIGHT;
     private final int DEFAULT_TIME;
     private final boolean INTERPOLATE;
+    private final boolean SMOOTH_ALPHA;
     private final ImmutableList<IntIntPair> FRAMES;
     private final ImmutableList<TextureHandle> BASES;
     private final int UPLOAD_X;
@@ -34,6 +35,7 @@ public class AnimationMetadata implements ParsedMetadata {
      * @param frameHeight       height of a frame in the animation
      * @param defaultTime       default time for a frame in the animation
      * @param interpolate       whether to interpolate frames in the animation
+     * @param smoothAlpha       whether to interpolate alpha smoothly throughout the animation
      * @param frames            frames in the animation
      * @param bases             textures that the animation will be uploaded to
      * @param uploadX           x-coordinate where the top-left corner of the animation should be uploaded
@@ -41,13 +43,14 @@ public class AnimationMetadata implements ParsedMetadata {
      * @param skipTicks         ticks to skip before the animation starts
      * @param daytimeSync       whether to synchronize the animation to the time of day
      */
-    public AnimationMetadata(int frameWidth, int frameHeight, int defaultTime, boolean interpolate,
+    public AnimationMetadata(int frameWidth, int frameHeight, int defaultTime, boolean interpolate, boolean smoothAlpha,
                              List<IntIntPair> frames, Collection<TextureHandle> bases, int uploadX, int uploadY,
                              int skipTicks, boolean daytimeSync) {
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
         DEFAULT_TIME = defaultTime;
         INTERPOLATE = interpolate;
+        SMOOTH_ALPHA = smoothAlpha;
         FRAMES = requireNonNull(ImmutableList.copyOf(frames), "Frames cannot be null");
         BASES = requireNonNull(ImmutableList.copyOf(bases), "Bases cannot be null");
         UPLOAD_X = uploadX;
@@ -80,6 +83,14 @@ public class AnimationMetadata implements ParsedMetadata {
      */
     public boolean interpolate() {
         return INTERPOLATE;
+    }
+
+    /**
+     * Gets whether to smoothly transition between alpha values in the animation.
+     * @return whether to smoothly transition between alpha values in the animation
+     */
+    public boolean smoothAlpha() {
+        return SMOOTH_ALPHA;
     }
 
     /**
