@@ -1,12 +1,15 @@
 package io.github.moremcmeta.animationplugin;
 
+import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
@@ -25,6 +28,9 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
     private final Area INTERPOLATE_AREA;
     private final int SYNC_TICKS;
     private final Supplier<Optional<Long>> TIME_GETTER;
+    private final Collection<TextureHandle> BASES;
+    private final int UPLOAD_X;
+    private final int UPLOAD_Y;
 
     @Override
     public void onTick(CurrentFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
@@ -59,6 +65,14 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
         );
     }
 
+    @Override
+    public void onUpload(UploadableFrameView currentFrame) {
+        BASES.forEach((base) -> {
+            base.bind();
+            currentFrame.upload(UPLOAD_X, UPLOAD_Y);
+        });
+    }
+
     /**
      * Creates a new animation component.
      * @param interpolateArea           pixels to interpolate/modify during the animation
@@ -69,10 +83,14 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
      * @param interpolator              interpolates between colors
      * @param syncTicks                 number of ticks to sync to; e.g. 24000 to sync to a Minecraft day
      * @param timeGetter                retrieves the current time in the world, if any
+     * @param bases                     textures to upload the animation to
+     * @param uploadX                   x-coordinate to upload the texture at
+     * @param uploadY                   y-coordinate to upload the texture at
      */
     private AnimationComponent(Area interpolateArea, int frames, int ticksUntilStart,
                                IntUnaryOperator frameTimeCalculator, IntUnaryOperator frameIndexMapper,
-                               Interpolator interpolator, int syncTicks, Supplier<Optional<Long>> timeGetter) {
+                               Interpolator interpolator, int syncTicks, Supplier<Optional<Long>> timeGetter,
+                               Collection<TextureHandle> bases, int uploadX, int uploadY) {
         STATE = new AnimationState(frames, frameTimeCalculator);
         TICKS_UNTIL_START = ticksUntilStart;
         STATE.tick(TICKS_UNTIL_START);
@@ -83,6 +101,9 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
 
         SYNC_TICKS = syncTicks;
         TIME_GETTER = timeGetter;
+        BASES = bases;
+        UPLOAD_X = uploadX;
+        UPLOAD_Y = uploadY;
     }
 
     /**
@@ -98,6 +119,9 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
         private Interpolator interpolator;
         private int syncTicks = -1;
         private Supplier<Optional<Long>> timeGetter = Optional::empty;
+        private Collection<TextureHandle> bases = ImmutableList.of();
+        private int uploadX = 0;
+        private int uploadY = 0;
 
         /**
          * Sets the interpolate area for this builder (required).
@@ -182,6 +206,28 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
         }
 
         /**
+         * Sets additional textures where this animation will be uploaded to.
+         * @param bases     textures to upload the animation to
+         * @param uploadX   x-coordinate to upload the texture at
+         * @param uploadY   y-coordinate to upload the texture at
+         * @return this builder
+         */
+        public Builder uploadTo(Collection<TextureHandle> bases, int uploadX, int uploadY) {
+            this.bases = requireNonNull(bases, "Bases cannot be null");
+
+            if (uploadX < 0) {
+                throw new IllegalArgumentException("Upload x-coordinate cannot be negative");
+            }
+            if (uploadY < 0) {
+                throw new IllegalArgumentException("Upload y-coordinate cannot be negative");
+            }
+
+            this.uploadX = uploadX;
+            this.uploadY = uploadY;
+            return this;
+        }
+
+        /**
          * Builds an {@link AnimationComponent} from the values provided to the builder. The interpolate area,
          * frames, ticks until start, frame time calculator, frame index mapper, and interpolator must have
          * been provided.
@@ -220,7 +266,10 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
                     frameIndexMapper,
                     interpolator,
                     syncTicks,
-                    timeGetter
+                    timeGetter,
+                    bases,
+                    uploadX,
+                    uploadY
             );
         }
 

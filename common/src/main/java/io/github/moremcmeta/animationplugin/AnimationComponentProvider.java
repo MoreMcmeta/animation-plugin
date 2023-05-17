@@ -98,7 +98,8 @@ public class AnimationComponentProvider implements ComponentProvider {
                 .ticksUntilStart(animationMetadata.skipTicks())
                 .frameTimeCalculator(frameTimeCalculator)
                 .frameIndexMapper(frameIndexMapper)
-                .interpolator(interpolator);
+                .interpolator(interpolator)
+                .uploadTo(animationMetadata.bases(), animationMetadata.uploadX(), animationMetadata.uploadY());
 
         if (animationMetadata.daytimeSync()) {
             componentBuilder.syncTicks(TICKS_PER_DAY, timeGetter);

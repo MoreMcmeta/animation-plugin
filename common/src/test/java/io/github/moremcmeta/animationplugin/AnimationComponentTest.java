@@ -1,6 +1,8 @@
 package io.github.moremcmeta.animationplugin;
 
+import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import org.junit.Rule;
@@ -12,6 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link AnimationComponent}.
@@ -502,6 +506,95 @@ public class AnimationComponentTest {
                 INTERPOLATOR.interpolate(60, 42, indexToColor(5), indexToColor(6)),
                 currentFrameView.color(0, 0)
         );
+    }
+
+    @Test
+    public void upload_NullBases_NullPointerException() {
+        int frames = 10;
+        expectedException.expect(NullPointerException.class);
+        new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(null, 2, 5);
+    }
+
+    @Test
+    public void upload_NegativeUploadX_IllegalArgException() {
+        int frames = 10;
+        expectedException.expect(IllegalArgumentException.class);
+        new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(ImmutableList.of(), -2, 5);
+    }
+
+    @Test
+    public void upload_NegativeUploadY_IllegalArgException() {
+        int frames = 10;
+        expectedException.expect(IllegalArgumentException.class);
+        new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(ImmutableList.of(), 2, -5);
+    }
+
+    @Test
+    public void upload_NoBases_NoneUploaded() {
+        int frames = 10;
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(ImmutableList.of(), 2, 5)
+                .build();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        component.onUpload(currentFrameView);
+        assertFalse(currentFrameView.wasUploaded());
+    }
+
+    @Test
+    public void upload_HasBases_AllUploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(ImmutableList.of(
+                        new TextureHandle(uploads::incrementAndGet, 3, 7, width, height),
+                        new TextureHandle(uploads::incrementAndGet, 3, 7, width, height),
+                        new TextureHandle(uploads::incrementAndGet, 3, 7, width, height)
+                ), 2, 5)
+                .build();
+
+        component.onUpload(currentFrameView);
+        assertTrue(currentFrameView.wasUploaded());
+        assertEquals(Point.pack(2, 5), currentFrameView.lastUploadPoint());
+        assertEquals(3, uploads.get());
     }
 
     public static int indexToColor(int index) {

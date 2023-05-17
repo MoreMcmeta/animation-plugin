@@ -8,6 +8,7 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
+import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
@@ -20,10 +21,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 
 import static io.github.moremcmeta.animationplugin.AnimationComponentTest.indexToColor;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link AnimationComponentProvider}.
@@ -252,6 +255,32 @@ public class AnimationComponentProviderTest {
                 new MockMutableFrameGroup(),
                 Set.of()
         );
+    }
+
+    @Test
+    public void assemble_HasBases_BasesPassedToComponent() {
+        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        AtomicInteger uploads = new AtomicInteger();
+        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+                new AnimationMetadata(10, 20, 33, true, SMALL_MOCK_FRAME_LIST,
+                        ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 3, 7, width, height)
+                        ),
+                        2, 5,
+                        0, true),
+                MOCK_FRAME_GROUP
+        );
+
+        component.onUpload(currentFrameView);
+
+        assertEquals(1, uploads.get());
+        assertTrue(currentFrameView.wasUploaded());
+        assertEquals(Point.pack(2, 5), currentFrameView.lastUploadPoint());
     }
 
     private static void checkChangedPoints(FrameGroup<MutableFrameView> frameGroup, Set<Long> expectedPoints) {
