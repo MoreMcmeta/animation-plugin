@@ -70,7 +70,10 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
     @Override
     public void onUpload(UploadableFrameView currentFrame,
                          Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
-        if (BASE != null && baseCache == null) {
+
+        /* If the base cache is empty, there is a user error or textures have not been loaded,
+           so the performance impact of repeated checking does not matter. */
+        if (BASE != null && (baseCache == null || baseCache.isEmpty())) {
             baseCache = textureLookup.apply(BASE).stream().filter(
                     (handle) -> isInBounds(handle, UPLOAD_X, UPLOAD_Y, currentFrame.width(), currentFrame.height())
             ).toList();
