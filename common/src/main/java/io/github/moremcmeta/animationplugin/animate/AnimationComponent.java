@@ -1,6 +1,5 @@
 package io.github.moremcmeta.animationplugin.animate;
 
-import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
@@ -8,9 +7,11 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
@@ -28,9 +29,10 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
     private final Area INTERPOLATE_AREA;
     private final int SYNC_TICKS;
     private final Supplier<Optional<Long>> TIME_GETTER;
-    private final Collection<TextureHandle> BASES;
+    private final ResourceLocation BASE;
     private final int UPLOAD_X;
     private final int UPLOAD_Y;
+    private Collection<TextureHandle> baseCache;
 
     @Override
     public void onTick(CurrentFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
@@ -66,8 +68,15 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
     }
 
     @Override
-    public void onUpload(UploadableFrameView currentFrame) {
-        BASES.forEach((base) -> {
+    public void onUpload(UploadableFrameView currentFrame,
+                         Function<ResourceLocation, Collection<TextureHandle>> textureLookup) {
+        if (BASE != null && baseCache == null) {
+            baseCache = textureLookup.apply(BASE).stream().filter(
+                    (handle) -> isInBounds(handle, UPLOAD_X, UPLOAD_Y, currentFrame.width(), currentFrame.height())
+            ).toList();
+        }
+
+        baseCache.forEach((base) -> {
             base.bind();
             currentFrame.upload(UPLOAD_X, UPLOAD_Y);
         });
@@ -83,14 +92,14 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
      * @param interpolator              interpolates between colors
      * @param syncTicks                 number of ticks to sync to; e.g. 24000 to sync to a Minecraft day
      * @param timeGetter                retrieves the current time in the world, if any
-     * @param bases                     textures to upload the animation to
+     * @param base                      textures to upload the animation to
      * @param uploadX                   x-coordinate to upload the texture at
      * @param uploadY                   y-coordinate to upload the texture at
      */
     private AnimationComponent(Area interpolateArea, int frames, int ticksUntilStart,
                                IntUnaryOperator frameTimeCalculator, IntUnaryOperator frameIndexMapper,
                                Interpolator interpolator, int syncTicks, Supplier<Optional<Long>> timeGetter,
-                               Collection<TextureHandle> bases, int uploadX, int uploadY) {
+                               ResourceLocation base, int uploadX, int uploadY) {
         STATE = new AnimationState(frames, frameTimeCalculator);
         TICKS_UNTIL_START = ticksUntilStart;
         STATE.tick(TICKS_UNTIL_START);
@@ -101,9 +110,21 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
 
         SYNC_TICKS = syncTicks;
         TIME_GETTER = timeGetter;
-        BASES = bases;
+        BASE = base;
         UPLOAD_X = uploadX;
         UPLOAD_Y = uploadY;
+    }
+
+    /**
+     * Validates that an animation would be uploaded within the bounds of all of its base textures.
+     * @param handle            texture handle for a base textures
+     * @param uploadX           x-coordinate where the top left corner of the frame will be uploaded
+     * @param uploadY           y-coordinate where the top left corner of the frame will be uploaded
+     * @param frameWidth        width of the animation frame
+     * @param frameHeight       height of the animation frame
+     */
+    private boolean isInBounds(TextureHandle handle, int uploadX, int uploadY, int frameWidth, int frameHeight) {
+        return uploadX <= handle.width() - frameWidth && uploadY <= handle.height() - frameHeight;
     }
 
     /**
@@ -119,7 +140,7 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
         private Interpolator interpolator;
         private int syncTicks = -1;
         private Supplier<Optional<Long>> timeGetter = Optional::empty;
-        private Collection<TextureHandle> bases = ImmutableList.of();
+        private ResourceLocation base;
         private int uploadX = 0;
         private int uploadY = 0;
 
@@ -207,13 +228,13 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
 
         /**
          * Sets additional textures where this animation will be uploaded to.
-         * @param bases     textures to upload the animation to
+         * @param base      textures to upload the animation to
          * @param uploadX   x-coordinate to upload the texture at
          * @param uploadY   y-coordinate to upload the texture at
          * @return this builder
          */
-        public Builder uploadTo(Collection<TextureHandle> bases, int uploadX, int uploadY) {
-            this.bases = requireNonNull(bases, "Bases cannot be null");
+        public Builder uploadTo(ResourceLocation base, int uploadX, int uploadY) {
+            this.base = requireNonNull(base, "Base cannot be null");
 
             if (uploadX < 0) {
                 throw new IllegalArgumentException("Upload x-coordinate cannot be negative");
@@ -267,7 +288,7 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView, Up
                     interpolator,
                     syncTicks,
                     timeGetter,
-                    bases,
+                    base,
                     uploadX,
                     uploadY
             );

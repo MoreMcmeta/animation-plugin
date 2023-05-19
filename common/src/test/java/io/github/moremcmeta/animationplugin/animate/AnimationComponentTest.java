@@ -7,6 +7,7 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
+import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -535,7 +536,7 @@ public class AnimationComponentTest {
                 .frameTimeCalculator((frame) -> (frame + 1) * 10)
                 .frameIndexMapper((frame) -> frame)
                 .interpolator(INTERPOLATOR)
-                .uploadTo(ImmutableList.of(), -2, 5);
+                .uploadTo(new ResourceLocation("textures/dummy.png"), -2, 5);
     }
 
     @Test
@@ -549,7 +550,7 @@ public class AnimationComponentTest {
                 .frameTimeCalculator((frame) -> (frame + 1) * 10)
                 .frameIndexMapper((frame) -> frame)
                 .interpolator(INTERPOLATOR)
-                .uploadTo(ImmutableList.of(), 2, -5);
+                .uploadTo(new ResourceLocation("textures/dummy.png"), 2, -5);
     }
 
     @Test
@@ -562,16 +563,16 @@ public class AnimationComponentTest {
                 .frameTimeCalculator((frame) -> (frame + 1) * 10)
                 .frameIndexMapper((frame) -> frame)
                 .interpolator(INTERPOLATOR)
-                .uploadTo(ImmutableList.of(), 2, 5)
+                .uploadTo(new ResourceLocation("textures/dummy.png"), 2, 5)
                 .build();
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
-        component.onUpload(currentFrameView);
+        component.onUpload(currentFrameView, (location) -> ImmutableList.of());
         assertFalse(currentFrameView.wasUploaded());
     }
 
     @Test
-    public void upload_HasBases_AllUploaded() {
+    public void upload_PerfectFit_Uploaded() {
         int frames = 10;
         AtomicInteger uploads = new AtomicInteger();
 
@@ -579,6 +580,7 @@ public class AnimationComponentTest {
         int width = currentFrameView.width();
         int height = currentFrameView.height();
 
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
         AnimationComponent component = new AnimationComponent.Builder()
                 .interpolateArea(Area.of(Point.pack(0, 0)))
                 .frames(frames)
@@ -586,17 +588,315 @@ public class AnimationComponentTest {
                 .frameTimeCalculator((frame) -> (frame + 1) * 10)
                 .frameIndexMapper((frame) -> frame)
                 .interpolator(INTERPOLATOR)
-                .uploadTo(ImmutableList.of(
-                        new TextureHandle(uploads::incrementAndGet, 3, 7, width, height),
-                        new TextureHandle(uploads::incrementAndGet, 3, 7, width, height),
-                        new TextureHandle(uploads::incrementAndGet, 3, 7, width, height)
-                ), 2, 5)
+                .uploadTo(base, 0, 0)
                 .build();
 
-        component.onUpload(currentFrameView);
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width, height),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width, height),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width, height)
+                         )
+                        : ImmutableList.of()
+        );
         assertTrue(currentFrameView.wasUploaded());
-        assertEquals(Point.pack(2, 5), currentFrameView.lastUploadPoint());
+        assertEquals(Point.pack(0, 0), currentFrameView.lastUploadPoint());
         assertEquals(3, uploads.get());
+    }
+
+    @Test
+    public void upload_NonZeroMinXY_Uploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(base, 0, 0)
+                .build();
+
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 3, 7, width, height),
+                                new TextureHandle(uploads::incrementAndGet, 3, 7, width, height),
+                                new TextureHandle(uploads::incrementAndGet, 3, 7, width, height)
+                         )
+                        : ImmutableList.of()
+        );
+        assertTrue(currentFrameView.wasUploaded());
+        assertEquals(Point.pack(0, 0), currentFrameView.lastUploadPoint());
+        assertEquals(3, uploads.get());
+    }
+
+    @Test
+    public void upload_TopLeftInBounds_Uploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(base, 0, 0)
+                .build();
+
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5)
+                         )
+                        : ImmutableList.of()
+        );
+        assertTrue(currentFrameView.wasUploaded());
+        assertEquals(Point.pack(0, 0), currentFrameView.lastUploadPoint());
+        assertEquals(3, uploads.get());
+    }
+
+    @Test
+    public void upload_TopRightInBounds_Uploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(base, 5, 0)
+                .build();
+
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5)
+                         )
+                        : ImmutableList.of()
+        );
+        assertTrue(currentFrameView.wasUploaded());
+        assertEquals(Point.pack(5, 0), currentFrameView.lastUploadPoint());
+        assertEquals(3, uploads.get());
+    }
+
+    @Test
+    public void upload_BottomLeftInBounds_Uploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(base, 0, 5)
+                .build();
+
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5)
+                         )
+                        : ImmutableList.of()
+        );
+        assertTrue(currentFrameView.wasUploaded());
+        assertEquals(Point.pack(0, 5), currentFrameView.lastUploadPoint());
+        assertEquals(3, uploads.get());
+    }
+
+    @Test
+    public void upload_BottomRightInBounds_Uploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(base, 5, 5)
+                .build();
+
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5)
+                         )
+                        : ImmutableList.of()
+        );
+        assertTrue(currentFrameView.wasUploaded());
+        assertEquals(Point.pack(5, 5), currentFrameView.lastUploadPoint());
+        assertEquals(3, uploads.get());
+    }
+
+    @Test
+    public void upload_AllBottomOutOfBounds_OnlyInBoundsUploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(base, 0, 6)
+                .build();
+
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5)
+                         )
+                        : ImmutableList.of()
+        );
+        assertFalse(currentFrameView.wasUploaded());
+        assertEquals(0, uploads.get());
+    }
+
+    @Test
+    public void upload_SomeBottomOutOfBounds_OnlyInBoundsUploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(base, 0, 6)
+                .build();
+
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 10, height + 10),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 10, height + 10)
+                         )
+                        : ImmutableList.of()
+        );
+        assertTrue(currentFrameView.wasUploaded());
+        assertEquals(Point.pack(0, 6), currentFrameView.lastUploadPoint());
+        assertEquals(2, uploads.get());
+    }
+
+    @Test
+    public void upload_AllRightOutOfBounds_OnlyInBoundsUploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(base, 6, 0)
+                .build();
+
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5)
+                         )
+                        : ImmutableList.of()
+        );
+        assertFalse(currentFrameView.wasUploaded());
+        assertEquals(0, uploads.get());
+    }
+
+    @Test
+    public void upload_SomeRightOutOfBounds_OnlyInBoundsUploaded() {
+        int frames = 10;
+        AtomicInteger uploads = new AtomicInteger();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        int width = currentFrameView.width();
+        int height = currentFrameView.height();
+
+        ResourceLocation base = new ResourceLocation("textures/dummy.png");
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(0, 0)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .uploadTo(base, 6, 0)
+                .build();
+
+        component.onUpload(currentFrameView, (location) -> location.equals(base)
+                        ? ImmutableList.of(
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 10, height + 10),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 5, height + 5),
+                                new TextureHandle(uploads::incrementAndGet, 0, 0, width + 10, height + 10)
+                         )
+                        : ImmutableList.of()
+        );
+        assertTrue(currentFrameView.wasUploaded());
+        assertEquals(Point.pack(6, 0), currentFrameView.lastUploadPoint());
+        assertEquals(2, uploads.get());
     }
 
     public static int indexToColor(int index) {

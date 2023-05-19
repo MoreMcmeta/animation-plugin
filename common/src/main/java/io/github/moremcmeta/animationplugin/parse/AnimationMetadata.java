@@ -1,12 +1,10 @@
 package io.github.moremcmeta.animationplugin.parse;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
-import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
+import net.minecraft.resources.ResourceLocation;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +21,7 @@ public class AnimationMetadata implements ParsedMetadata {
     private final boolean INTERPOLATE;
     private final boolean SMOOTH_ALPHA;
     private final ImmutableList<IntIntPair> FRAMES;
-    private final ImmutableList<TextureHandle> BASES;
+    private final Optional<ResourceLocation> BASE;
     private final int UPLOAD_X;
     private final int UPLOAD_Y;
     private final int SKIP_TICKS;
@@ -37,14 +35,14 @@ public class AnimationMetadata implements ParsedMetadata {
      * @param interpolate       whether to interpolate frames in the animation
      * @param smoothAlpha       whether to interpolate alpha smoothly throughout the animation
      * @param frames            frames in the animation
-     * @param bases             textures that the animation will be uploaded to
+     * @param base              textures that the animation will be uploaded to
      * @param uploadX           x-coordinate where the top-left corner of the animation should be uploaded
      * @param uploadY           y-coordinate where the top-left corner of the animation should be uploaded
      * @param skipTicks         ticks to skip before the animation starts
      * @param daytimeSync       whether to synchronize the animation to the time of day
      */
     public AnimationMetadata(int frameWidth, int frameHeight, int defaultTime, boolean interpolate, boolean smoothAlpha,
-                             List<IntIntPair> frames, Collection<TextureHandle> bases, int uploadX, int uploadY,
+                             List<IntIntPair> frames, Optional<ResourceLocation> base, int uploadX, int uploadY,
                              int skipTicks, boolean daytimeSync) {
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
@@ -52,7 +50,7 @@ public class AnimationMetadata implements ParsedMetadata {
         INTERPOLATE = interpolate;
         SMOOTH_ALPHA = smoothAlpha;
         FRAMES = requireNonNull(ImmutableList.copyOf(frames), "Frames cannot be null");
-        BASES = requireNonNull(ImmutableList.copyOf(bases), "Bases cannot be null");
+        BASE = requireNonNull(base, "Base cannot be null");
         UPLOAD_X = uploadX;
         UPLOAD_Y = uploadY;
         SKIP_TICKS = skipTicks;
@@ -103,11 +101,11 @@ public class AnimationMetadata implements ParsedMetadata {
     }
 
     /**
-     * Gets all textures that the animation will be uploaded to
-     * @return textures that the animation will be uploaded to
+     * Gets the location of the texture that the animation will be uploaded to
+     * @return texture that the animation will be uploaded to
      */
-    public ImmutableCollection<TextureHandle> bases() {
-        return BASES;
+    public Optional<ResourceLocation> base() {
+        return BASE;
     }
 
     /**
