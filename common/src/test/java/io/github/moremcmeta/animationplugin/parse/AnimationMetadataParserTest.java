@@ -307,12 +307,34 @@ public class AnimationMetadataParserTest {
                         ))
                 )
         );
-        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
+        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 100);
 
         assertEquals(
                 List.of(IntIntPair.of(5, 1), IntIntPair.of(2, 1), IntIntPair.of(0, 1)),
                 metadata.predefinedFrames()
         );
+    }
+
+    @Test
+    public void parse_PredefinedFramesOnlyIndicesTooLargeFrameIndex_InvalidMetadataException() throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of(
+                        "animation",
+                        new MockMetadataView(ImmutableMap.of(
+                                "width", 5,
+                                "height", 5,
+                                "frames",
+                                new MockMetadataView(ImmutableMap.of(
+                                        "0", 8,
+                                        "1", 2,
+                                        "2", 0
+                                ))
+                        ))
+                )
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        PARSER.parse(metadataView, 10, 20);
     }
 
     @Test
@@ -330,12 +352,35 @@ public class AnimationMetadataParserTest {
                         ))
                 )
         );
-        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
+        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 100);
 
         assertEquals(
                 List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 4), IntIntPair.of(0, 7)),
                 metadata.predefinedFrames()
         );
+    }
+
+    @Test
+    public void parse_PredefinedFramesOnlyObjectsTooLargeFrameIndex_InvalidMetadataException()
+            throws InvalidMetadataException {
+        MetadataView metadataView = new MockMetadataView(
+                ImmutableMap.of(
+                        "animation",
+                        new MockMetadataView(ImmutableMap.of(
+                                "width", 5,
+                                "height", 5,
+                                "frames",
+                                new MockMetadataView(ImmutableMap.of(
+                                        "0", new MockMetadataView(ImmutableMap.of("index", 8, "time", 12)),
+                                        "1", new MockMetadataView(ImmutableMap.of("index", 2, "time", 4)),
+                                        "2", new MockMetadataView(ImmutableMap.of("index", 0, "time", 7))
+                                ))
+                        ))
+                )
+        );
+
+        expectedException.expect(InvalidMetadataException.class);
+        PARSER.parse(metadataView, 10, 20);
     }
 
     @Test
@@ -433,7 +478,7 @@ public class AnimationMetadataParserTest {
                         ))
                 )
         );
-        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
+        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 100);
 
         assertEquals(
                 List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 1), IntIntPair.of(0, 7)),
@@ -457,7 +502,7 @@ public class AnimationMetadataParserTest {
                         ))
                 )
         );
-        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
+        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 100);
 
         assertEquals(
                 List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 13), IntIntPair.of(0, 7)),
@@ -481,7 +526,7 @@ public class AnimationMetadataParserTest {
                         ))
                 )
         );
-        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
+        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 100);
 
         assertEquals(
                 List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 13), IntIntPair.of(0, 7)),
@@ -506,7 +551,7 @@ public class AnimationMetadataParserTest {
                         ))
                 )
         );
-        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
+        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 100);
 
         assertEquals(
                 List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 13), IntIntPair.of(8, 2)),
@@ -758,7 +803,7 @@ public class AnimationMetadataParserTest {
                 )
         );
 
-        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
+        AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 100, 100);
         assertEquals(18, (int) metadata.frameWidth().orElseThrow());
         assertEquals(27, (int) metadata.frameHeight().orElseThrow());
         assertEquals(5, metadata.defaultTime());
