@@ -1,9 +1,12 @@
 package io.github.moremcmeta.animationplugin.parse;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.moremcmeta.animationplugin.MockMetadataView;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
+import io.github.moremcmeta.moremcmeta.api.math.Point;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
@@ -611,9 +614,7 @@ public class AnimationMetadataParserTest {
         );
         AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
 
-        assertTrue(metadata.base().isEmpty());
-        assertEquals(0, metadata.uploadX());
-        assertEquals(0, metadata.uploadY());
+        assertTrue(metadata.bases().isEmpty());
     }
 
     @Test
@@ -623,7 +624,7 @@ public class AnimationMetadataParserTest {
         );
         AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
 
-        assertEquals(0, metadata.uploadX());
+        assertTrue(metadata.bases().isEmpty());
     }
 
     @Test
@@ -633,7 +634,7 @@ public class AnimationMetadataParserTest {
         );
         AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
 
-        assertEquals(0, metadata.uploadY());
+        assertTrue(metadata.bases().isEmpty());
     }
 
     @Test
@@ -643,8 +644,7 @@ public class AnimationMetadataParserTest {
         );
         AnimationMetadata metadata = (AnimationMetadata) PARSER.parse(metadataView, 10, 20);
 
-        assertEquals(0, metadata.uploadX());
-        assertEquals(0, metadata.uploadY());
+        assertTrue(metadata.bases().isEmpty());
     }
 
     @Test
@@ -743,9 +743,11 @@ public class AnimationMetadataParserTest {
         AnimationMetadataParser parser = new AnimationMetadataParser();
         AnimationMetadata metadata = (AnimationMetadata) parser.parse(metadataView, 10, 20);
 
-        assertEquals(new ResourceLocation("textures/test.png"), metadata.base().orElseThrow());
-        assertEquals(0, metadata.uploadX());
-        assertEquals(0, metadata.uploadY());
+        Base base = ImmutableList.copyOf(metadata.bases()).get(0);
+        assertEquals(new ResourceLocation("textures/test.png"), base.baseLocation());
+        long uploadPoint = base.uploadPoint();
+        assertEquals(0, Point.x(uploadPoint));
+        assertEquals(0, Point.y(uploadPoint));
     }
 
     @Test
@@ -814,9 +816,12 @@ public class AnimationMetadataParserTest {
                 List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 5), IntIntPair.of(0, 7)),
                 metadata.predefinedFrames()
         );
-        assertFalse(metadata.base().isEmpty());
-        assertEquals(0, metadata.uploadX());
-        assertEquals(10, metadata.uploadY());
+        assertFalse(metadata.bases().isEmpty());
+        Base base = ImmutableList.copyOf(metadata.bases()).get(0);
+        assertEquals(new ResourceLocation("minecraft:textures/test.png"), base.baseLocation());
+        long uploadPoint = base.uploadPoint();
+        assertEquals(0, Point.x(uploadPoint));
+        assertEquals(10, Point.y(uploadPoint));
     }
 
     @Test

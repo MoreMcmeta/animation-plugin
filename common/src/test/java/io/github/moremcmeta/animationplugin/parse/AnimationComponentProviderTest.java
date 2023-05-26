@@ -14,12 +14,9 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
-import io.github.moremcmeta.moremcmeta.api.client.texture.TextureHandle;
-import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
-import net.minecraft.resources.ResourceLocation;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -28,11 +25,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.github.moremcmeta.animationplugin.animate.AnimationComponentTest.indexToColor;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link AnimationComponentProvider}.
@@ -76,7 +71,7 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         expectedException.expect(NullPointerException.class);
         provider.assemble(new AnimationMetadata(10, 20, 10, true, false, LARGE_MOCK_FRAME_LIST,
-                Optional.empty(), 0, 0, 0, true), null);
+                0, true, ImmutableList.of()), null);
     }
 
     @Test
@@ -90,9 +85,9 @@ public class AnimationComponentProviderTest {
     public void assemble_NotSyncedNoPredefinedFrames_DefaultFrameTimeUsed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
-                        Optional.empty(), 0, 0, 0, false),
+                        0, false, ImmutableList.of()),
                 MOCK_FRAME_GROUP
         );
 
@@ -110,9 +105,9 @@ public class AnimationComponentProviderTest {
     public void assemble_NotSyncedHasMorePredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 new AnimationMetadata(10, 20, 33, true, false, LARGE_MOCK_FRAME_LIST,
-                        Optional.empty(), 0, 0, 0, false),
+                        0, false, ImmutableList.of()),
                 MOCK_FRAME_GROUP
         );
 
@@ -134,9 +129,9 @@ public class AnimationComponentProviderTest {
     public void assemble_NotSyncedHasFewerPredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 new AnimationMetadata(10, 20, 33, true, false, SMALL_MOCK_FRAME_LIST,
-                        Optional.empty(), 0, 0, 0, false),
+                        0, false, ImmutableList.of()),
                 MOCK_FRAME_GROUP
         );
 
@@ -158,9 +153,9 @@ public class AnimationComponentProviderTest {
     public void assemble_SyncedNoPredefinedFrames_DefaultFrameTimeUsed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
-                        Optional.empty(), 0, 0, 0, true),
+                        0, true, ImmutableList.of()),
                 MOCK_FRAME_GROUP
         );
 
@@ -178,9 +173,9 @@ public class AnimationComponentProviderTest {
     public void assemble_SyncedHasMorePredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 new AnimationMetadata(10, 20, 33, true, false, LARGE_MOCK_FRAME_LIST,
-                        Optional.empty(), 0, 0, 0, true),
+                        0, true, ImmutableList.of()),
                 MOCK_FRAME_GROUP
         );
 
@@ -202,9 +197,9 @@ public class AnimationComponentProviderTest {
     public void assemble_SyncedHasFewerPredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 new AnimationMetadata(10, 20, 33, true, false, SMALL_MOCK_FRAME_LIST,
-                        Optional.empty(), 0, 0, 0, true),
+                        0, true, ImmutableList.of()),
                 MOCK_FRAME_GROUP
         );
 
@@ -264,41 +259,12 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_HasBase_BasePassedToComponent() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
-
-        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
-        int width = currentFrameView.width();
-        int height = currentFrameView.height();
-
-        ResourceLocation base = new ResourceLocation("textures/base/test.png");
-        AtomicInteger uploads = new AtomicInteger();
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, false, SMALL_MOCK_FRAME_LIST,
-                        Optional.of(base),
-                        0, 0,
-                        0, true),
-                MOCK_FRAME_GROUP
-        );
-
-        TextureHandle handle = new TextureHandle(uploads::incrementAndGet, 3, 7, width, height);
-        component.onUpload(
-                currentFrameView,
-                (location) -> location.equals(base) ? ImmutableList.of(handle) : ImmutableList.of()
-        );
-
-        assertEquals(1, uploads.get());
-        assertTrue(currentFrameView.wasUploaded());
-        assertEquals(Point.pack(0, 0), currentFrameView.lastUploadPoint());
-    }
-
-    @Test
     public void assemble_AlphaSmoothDisabled_AlphaNotSmoothed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
-                        Optional.empty(), 0, 0, 0, false),
+                        0, false, ImmutableList.of()),
                 MOCK_FRAME_GROUP
         );
 
@@ -318,9 +284,9 @@ public class AnimationComponentProviderTest {
     public void assemble_AlphaSmoothEnabled_AlphaSmoothed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 new AnimationMetadata(10, 20, time, true, true, ImmutableList.of(),
-                        Optional.empty(), 0, 0, 0, false),
+                        0, false, ImmutableList.of()),
                 MOCK_FRAME_GROUP
         );
 
@@ -339,9 +305,9 @@ public class AnimationComponentProviderTest {
     private static void checkChangedPoints(FrameGroup<MutableFrameView> frameGroup, Set<Long> expectedPoints) {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView, UploadableFrameView> component = provider.assemble(
+        TextureComponent<CurrentFrameView> component = provider.assemble(
                 new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
-                        Optional.empty(), 0, 0, 0, false),
+                        0, false, ImmutableList.of()),
                 frameGroup
         );
 

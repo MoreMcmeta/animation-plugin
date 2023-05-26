@@ -2,14 +2,18 @@ package io.github.moremcmeta.animationplugin.parse;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.animationplugin.ModConstants;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.math.Point;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,21 +69,20 @@ public class AnimationMetadataParser implements MetadataParser {
                     + outOfBoundsIndex.get());
         }
 
-
-        Optional<ResourceLocation> base = Optional.empty();
-        int uploadX = 0;
-        int uploadY = 0;
-        Optional<String> baseLocation = sectionMetadata.stringValue("base");
-        if (baseLocation.isPresent()) {
-            base = Optional.of(parseResourceLocation(baseLocation.get()));
-            uploadX = sectionMetadata.integerValue("x")
+        Collection<Base> bases = new ArrayList<>();
+        Optional<String> rawBaseLocation = sectionMetadata.stringValue("base");
+        if (rawBaseLocation.isPresent()) {
+            ResourceLocation baseLocation = parseResourceLocation(rawBaseLocation.get());
+            int uploadX = sectionMetadata.integerValue("x")
                     .orElseThrow(() -> new InvalidMetadataException("Base defined without x upload coordinate"));
-            uploadY = sectionMetadata.integerValue("y")
+            int uploadY = sectionMetadata.integerValue("y")
                     .orElseThrow(() -> new InvalidMetadataException("Base defined without y upload coordinate"));
 
             if (uploadX < 0 || uploadY < 0) {
                 throw new InvalidMetadataException("Upload x- and y-coordinates must be non-negative");
             }
+
+            bases.add(new Base(baseLocation, Point.pack(uploadX, uploadY)));
         }
 
         int skipTicks = sectionMetadata.integerValue("skip").orElse(0);
@@ -94,11 +97,9 @@ public class AnimationMetadataParser implements MetadataParser {
                 interpolate,
                 smoothAlpha,
                 frames,
-                base,
-                uploadX,
-                uploadY,
                 skipTicks,
-                daytimeSync
+                daytimeSync,
+                bases
         );
     }
 

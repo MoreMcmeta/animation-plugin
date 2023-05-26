@@ -12,7 +12,6 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
-import io.github.moremcmeta.moremcmeta.api.client.texture.UploadableFrameView;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
@@ -45,7 +44,7 @@ public class AnimationComponentProvider implements ComponentProvider {
     }
 
     @Override
-    public TextureComponent<CurrentFrameView, UploadableFrameView>
+    public TextureComponent<CurrentFrameView>
     assemble(ParsedMetadata metadata, FrameGroup<? extends MutableFrameView> frames) {
         requireNonNull(metadata, "Metadata cannot be null");
         requireNonNull(frames, "Frame group cannot be null");
@@ -109,14 +108,6 @@ public class AnimationComponentProvider implements ComponentProvider {
                 .frameTimeCalculator(frameTimeCalculator)
                 .frameIndexMapper(frameIndexMapper)
                 .interpolator(interpolator);
-
-        if (animationMetadata.base().isPresent()) {
-            componentBuilder.uploadTo(
-                    animationMetadata.base().get(),
-                    animationMetadata.uploadX(),
-                    animationMetadata.uploadY()
-            );
-        }
 
         if (animationMetadata.daytimeSync()) {
             componentBuilder.syncTicks(TICKS_PER_DAY, timeGetter);
