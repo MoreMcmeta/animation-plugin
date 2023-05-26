@@ -55,7 +55,7 @@ public class AnimationMetadataParser implements MetadataParser {
         List<IntIntPair> frames;
         int maxIndex = (imageWidth / frameWidth) * (imageHeight / frameHeight) - 1;
         if (framesViewOptional.isPresent()) {
-            frames = parseFrameList(framesViewOptional.get(), defaultTime, maxIndex);
+            frames = parseFrameList(framesViewOptional.get(), defaultTime);
         } else {
             frames = ImmutableList.of();
         }
@@ -107,11 +107,10 @@ public class AnimationMetadataParser implements MetadataParser {
      * Parses all the frames from an array of frame metadata.
      * @param framesView        array of frame metadata
      * @param defaultTime       default time for frames in the animation
-     * @param maxIndex          maximum index of a frame in the animation
      * @return all frames in the animation as (index, time) pairs
      * @throws InvalidMetadataException if any frames within the array are missing an index
      */
-    private List<IntIntPair> parseFrameList(MetadataView framesView, int defaultTime, int maxIndex)
+    private List<IntIntPair> parseFrameList(MetadataView framesView, int defaultTime)
             throws InvalidMetadataException {
         ImmutableList.Builder<IntIntPair> frames = new ImmutableList.Builder<>();
 
