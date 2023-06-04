@@ -2,8 +2,6 @@ package io.github.moremcmeta.animationplugin;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
 
-import java.util.Optional;
-
 import static io.github.moremcmeta.animationplugin.animate.AnimationComponentTest.indexToColor;
 
 /**
@@ -30,10 +28,5 @@ public class MockPersistentFrameView implements PersistentFrameView {
     @Override
     public int height() {
         return 20;
-    }
-
-    @Override
-    public Optional<Integer> index() {
-        return Optional.of(INDEX);
     }
 }

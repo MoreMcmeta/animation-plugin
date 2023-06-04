@@ -33,7 +33,7 @@ public class DefaultAlphaInterpolatorTest {
     public void interpolate_StepGreaterThanSteps_IllegalArgException() {
         DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
         expectedException.expect(IllegalArgumentException.class);
-        interpolator.interpolate(10, 0, 0, 0);
+        interpolator.interpolate(10, 11, 0, 0);
     }
 
     @Test

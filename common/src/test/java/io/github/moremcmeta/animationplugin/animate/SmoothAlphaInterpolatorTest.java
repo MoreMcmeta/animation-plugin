@@ -33,7 +33,7 @@ public class SmoothAlphaInterpolatorTest {
     public void interpolate_StepGreaterThanSteps_IllegalArgException() {
         SmoothAlphaInterpolator interpolator = new SmoothAlphaInterpolator();
         expectedException.expect(IllegalArgumentException.class);
-        interpolator.interpolate(10, 0, 0, 0);
+        interpolator.interpolate(10, 11, 0, 0);
     }
 
     @Test

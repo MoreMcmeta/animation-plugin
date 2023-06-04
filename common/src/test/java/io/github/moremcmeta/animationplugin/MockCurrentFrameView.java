@@ -7,11 +7,6 @@ import io.github.moremcmeta.moremcmeta.api.math.Point;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 
-import java.util.Arrays;
-import java.util.Optional;
-
-import static io.github.moremcmeta.animationplugin.animate.AnimationComponentTest.indexToColor;
-
 /**
  * Mock implementation of {@link CurrentFrameView}.
  * @author soir20
@@ -23,14 +18,13 @@ public class MockCurrentFrameView implements CurrentFrameView {
 
     public MockCurrentFrameView() {
         PIXELS = new int[HEIGHT][WIDTH];
-        replaceWith(0);
     }
 
     @Override
-    public void generateWith(ColorTransform transform, Area applyArea, Area dependencies) {
+    public void generateWith(ColorTransform transform, Area applyArea) {
 
         Long2IntMap oldColors = new Long2IntOpenHashMap();
-        for (long dependency : dependencies) {
+        for (long dependency : applyArea) {
             oldColors.put(dependency, PIXELS[Point.y(dependency)][Point.x(dependency)]);
         }
 
@@ -46,15 +40,6 @@ public class MockCurrentFrameView implements CurrentFrameView {
     }
 
     @Override
-    public void replaceWith(int index) {
-        int newColor = indexToColor(index);
-
-        for (int y = 0; y < HEIGHT; y++) {
-            Arrays.fill(PIXELS[y], newColor);
-        }
-    }
-
-    @Override
     public int width() {
         return WIDTH;
     }
@@ -62,11 +47,6 @@ public class MockCurrentFrameView implements CurrentFrameView {
     @Override
     public int height() {
         return HEIGHT;
-    }
-
-    @Override
-    public Optional<Integer> index() {
-        return Optional.empty();
     }
 
     public int color(int x, int y) {

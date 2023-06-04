@@ -18,8 +18,8 @@ public abstract class RGBAInterpolator implements Interpolator {
      * @return  the interpolated frame at this step
      */
     public int interpolate(int steps, int step, int start, int end) {
-        if (step < 1 || step >= steps) {
-            throw new IllegalArgumentException("Step must be between 1 and steps - 1 (inclusive)");
+        if (step < 0 || step >= steps) {
+            throw new IllegalArgumentException("Step must be between 0 and steps - 1 (inclusive)");
         }
 
         double ratio = 1.0 - (step / (double) steps);

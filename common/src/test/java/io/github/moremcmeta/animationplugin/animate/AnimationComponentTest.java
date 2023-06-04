@@ -1,7 +1,7 @@
 package io.github.moremcmeta.animationplugin.animate;
 
+import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.animationplugin.MockCurrentFrameView;
-import io.github.moremcmeta.animationplugin.MockPersistentFrameGroup;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
@@ -9,9 +9,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -152,6 +154,18 @@ public class AnimationComponentTest {
     }
 
     @Test
+    public void build_NegativeXInBase_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new AnimationComponent.Builder().coordinateInBase(-1, 10);
+    }
+
+    @Test
+    public void build_NegativeYInBase_IllegalArgException() {
+        expectedException.expect(IllegalArgumentException.class);
+        new AnimationComponent.Builder().coordinateInBase(10, -1);
+    }
+
+    @Test
     @SuppressWarnings("OptionalAssignedToNull")
     public void tick_SyncedTimeGetterReturnsNull_NullPointerException() {
         AnimationComponent component = new AnimationComponent.Builder()
@@ -165,7 +179,7 @@ public class AnimationComponentTest {
                 .build();
 
         expectedException.expect(NullPointerException.class);
-        component.onTick(new MockCurrentFrameView(), new MockPersistentFrameGroup(5));
+        component.onTick(new MockCurrentFrameView(), makeMockFrames(5));
     }
 
     @Test
@@ -185,7 +199,7 @@ public class AnimationComponentTest {
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         while (tick.getAndIncrement() < animationLength) {
-            component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+            component.onTick(currentFrameView, makeMockFrames(frames));
         }
 
         assertEquals(indexToColor(0), currentFrameView.color(0, 0));
@@ -207,7 +221,7 @@ public class AnimationComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+            component.onTick(currentFrameView, makeMockFrames(frames));
         }
 
         assertEquals(
@@ -232,7 +246,7 @@ public class AnimationComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+            component.onTick(currentFrameView, makeMockFrames(frames));
         }
 
         assertEquals(
@@ -257,7 +271,7 @@ public class AnimationComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+            component.onTick(currentFrameView, makeMockFrames(frames));
         }
 
         assertEquals(
@@ -282,7 +296,7 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 INTERPOLATOR.interpolate(10, 1, indexToColor(0), indexToColor(1)),
@@ -306,7 +320,7 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 indexToColor(0),
@@ -330,7 +344,7 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 INTERPOLATOR.interpolate(90, 15, indexToColor(8), indexToColor(9)),
@@ -354,7 +368,7 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 INTERPOLATOR.interpolate(90, 65, indexToColor(8), indexToColor(9)),
@@ -378,7 +392,7 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 INTERPOLATOR.interpolate(90, 20, indexToColor(8), indexToColor(9)),
@@ -402,7 +416,7 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 INTERPOLATOR.interpolate(90, 30, indexToColor(8), indexToColor(9)),
@@ -426,7 +440,7 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 INTERPOLATOR.interpolate(90, 70, indexToColor(8), indexToColor(9)),
@@ -450,7 +464,7 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 INTERPOLATOR.interpolate(90, 81, indexToColor(8), indexToColor(9)),
@@ -474,7 +488,7 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 INTERPOLATOR.interpolate(90, 15, indexToColor(8), indexToColor(9)),
@@ -498,11 +512,50 @@ public class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick(currentFrameView, new MockPersistentFrameGroup(frames));
+        component.onTick(currentFrameView, makeMockFrames(frames));
 
         assertEquals(
                 INTERPOLATOR.interpolate(60, 42, indexToColor(5), indexToColor(6)),
                 currentFrameView.color(0, 0)
+        );
+    }
+
+    @Test
+    public void tick_NonZeroBaseCoord_CorrectAnimFrame() {
+        int frames = 10;
+        AnimationComponent component = new AnimationComponent.Builder()
+                .interpolateArea(Area.of(Point.pack(7, 14)))
+                .frames(frames)
+                .ticksUntilStart(0)
+                .frameTimeCalculator((frame) -> (frame + 1) * 10)
+                .frameIndexMapper((frame) -> frame)
+                .interpolator(INTERPOLATOR)
+                .coordinateInBase(5, 10)
+                .build();
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+
+        List<Frame> mockFrames = ImmutableList.of(
+                (x, y) -> x == 2 && y == 4 ? indexToColor(0) : 0,
+                (x, y) -> x == 2 && y == 4 ? indexToColor(1) : 0,
+                (x, y) -> x == 2 && y == 4 ? indexToColor(2) : 0,
+                (x, y) -> x == 2 && y == 4 ? indexToColor(3) : 0,
+                (x, y) -> x == 2 && y == 4 ? indexToColor(4) : 0,
+                (x, y) -> x == 2 && y == 4 ? indexToColor(5) : 0,
+                (x, y) -> x == 2 && y == 4 ? indexToColor(6) : 0,
+                (x, y) -> x == 2 && y == 4 ? indexToColor(7) : 0,
+                (x, y) -> x == 2 && y == 4 ? indexToColor(8) : 0,
+                (x, y) -> x == 2 && y == 4 ? indexToColor(9) : 0
+        );
+
+        int animationLength = 330;
+        for (int tick = 0; tick < animationLength; tick++) {
+            component.onTick(currentFrameView, mockFrames);
+        }
+
+        assertEquals(
+                INTERPOLATOR.interpolate(80, 50, indexToColor(7), indexToColor(8)),
+                currentFrameView.color(7, 14)
         );
     }
 
@@ -512,6 +565,10 @@ public class AnimationComponentTest {
 
     private static int indexToComp(int index) {
         return index * 10 % 256;
+    }
+    
+    private static List<Frame> makeMockFrames(int frames) {
+        return IntStream.range(0, frames).<Frame>mapToObj((index) -> (x, y) -> indexToColor(index)).toList();
     }
 
 }

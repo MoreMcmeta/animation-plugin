@@ -1,11 +1,9 @@
 package io.github.moremcmeta.animationplugin.parse;
 
 import com.google.common.collect.ImmutableList;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.Base;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.animationplugin.animate.Frame;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +13,7 @@ import static java.util.Objects.requireNonNull;
  * Contains animation metadata that has been parsed.
  * @author soir20
  */
-public class AnimationMetadata implements ParsedMetadata {
+public class AnimationMetadata {
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;
     private final int DEFAULT_TIME;
@@ -24,7 +22,10 @@ public class AnimationMetadata implements ParsedMetadata {
     private final ImmutableList<IntIntPair> FRAMES;
     private final int SKIP_TICKS;
     private final boolean DAYTIME_SYNC;
-    private final Collection<Base> BASES;
+    private final int X_IN_BASE;
+    private final int Y_IN_BASE;
+    private final Optional<List<Frame>> PART_FRAMES;
+    private final Runnable RESOURCE_CLOSER;
 
     /**
      * Creates a new container for animation metadata.
@@ -36,10 +37,15 @@ public class AnimationMetadata implements ParsedMetadata {
      * @param frames            frames in the animation
      * @param skipTicks         ticks to skip before the animation starts
      * @param daytimeSync       whether to synchronize the animation to the time of day
-     * @param bases             base textures of the animation
+     * @param xInBase           x-coordinate of the top-left corner of this animation within the base texture
+     * @param yInBase           y-coordinate of the top-left corner of this animation within the base texture
+     * @param partFrames        frames this animation should use if it should not use predefined
+     *                          frames in the base texture
+     * @param resourceCloser    closes resources associated with this animation
      */
     public AnimationMetadata(int frameWidth, int frameHeight, int defaultTime, boolean interpolate, boolean smoothAlpha,
-                             List<IntIntPair> frames, int skipTicks, boolean daytimeSync, Collection<Base> bases) {
+                             List<IntIntPair> frames, int skipTicks, boolean daytimeSync, int xInBase, int yInBase,
+                             Optional<List<Frame>> partFrames, Runnable resourceCloser) {
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
         DEFAULT_TIME = defaultTime;
@@ -48,22 +54,26 @@ public class AnimationMetadata implements ParsedMetadata {
         FRAMES = requireNonNull(ImmutableList.copyOf(frames), "Frames cannot be null");
         SKIP_TICKS = skipTicks;
         DAYTIME_SYNC = daytimeSync;
-        BASES = requireNonNull(bases, "Bases cannot be null");
+        X_IN_BASE = xInBase;
+        Y_IN_BASE = yInBase;
+        PART_FRAMES = requireNonNull(partFrames, "Part frames cannot be null");
+        RESOURCE_CLOSER = requireNonNull(resourceCloser, "Resource closer cannot be null");
     }
 
-    @Override
-    public Optional<Integer> frameWidth() {
-        return Optional.of(FRAME_WIDTH);
+    /**
+     * Gets the width of a frame in this animation.
+     * @return width of a frame in this animation
+     */
+    public int frameWidth() {
+        return FRAME_WIDTH;
     }
 
-    @Override
-    public Optional<Integer> frameHeight() {
-        return Optional.of(FRAME_HEIGHT);
-    }
-
-    @Override
-    public Collection<Base> bases() {
-        return BASES;
+    /**
+     * Gets the height of a frame in this animation.
+     * @return height of a frame in this animation
+     */
+    public int frameHeight() {
+        return FRAME_HEIGHT;
     }
 
     /**
@@ -113,6 +123,37 @@ public class AnimationMetadata implements ParsedMetadata {
      */
     public boolean daytimeSync() {
         return DAYTIME_SYNC;
+    }
+
+    /**
+     * Frames this animation should use if it should not use predefined frames in the base texture.
+     * @return frames this animation should use if it should not use predefined frames in the base texture
+     */
+    public Optional<List<Frame>> partFrames() {
+        return PART_FRAMES;
+    }
+
+    /**
+     * Gets the x-coordinate of the top-left corner of this animation within the base texture.
+     * @return x-coordinate of the top-left corner of this animation within the base texture
+     */
+    public int xInBase() {
+        return X_IN_BASE;
+    }
+
+    /**
+     * Gets the y-coordinate of the top-left corner of this animation within the base texture.
+     * @return y-coordinate of the top-left corner of this animation within the base texture
+     */
+    public int yInBase() {
+        return Y_IN_BASE;
+    }
+
+    /**
+     * Closes all resources associated with this animation.
+     */
+    public void close() {
+        RESOURCE_CLOSER.run();
     }
 
 }

@@ -54,7 +54,7 @@ public class AnimationStateTest {
     public void tickAnimation_NoTicks_FirstFrame() {
         AnimationState state = new AnimationState(5, (frame) -> 10);
         assertEquals(0, state.startIndex());
-        assertEquals(0, state.endIndex());
+        assertEquals(1, state.endIndex());
         assertEquals(0, state.frameTicks());
         assertEquals(10, state.frameMaxTime());
         assertEquals(0, state.ticks());
@@ -71,7 +71,7 @@ public class AnimationStateTest {
                 state.tick(1);
             }
             assertEquals(nextFrame, state.startIndex());
-            assertEquals(nextFrame, state.endIndex());
+            assertEquals((nextFrame + 1) % frames, state.endIndex());
             assertEquals(0, state.frameTicks());
             assertEquals(frameLength, state.frameMaxTime());
             assertEquals(nextFrame * frameLength, state.ticks());
@@ -87,7 +87,7 @@ public class AnimationStateTest {
             state.tick(1);
         }
         assertEquals(2, state.startIndex());
-        assertEquals(2, state.endIndex());
+        assertEquals(3, state.endIndex());
         assertEquals(0, state.frameTicks());
         assertEquals(30, state.frameMaxTime());
         assertEquals(30, state.ticks());
@@ -103,7 +103,7 @@ public class AnimationStateTest {
         }
 
         assertEquals(0, state.startIndex());
-        assertEquals(0, state.endIndex());
+        assertEquals(1, state.endIndex());
         assertEquals(0, state.frameTicks());
         assertEquals(10, state.frameMaxTime());
         assertEquals(frames * frameLength, state.ticks());
@@ -193,7 +193,7 @@ public class AnimationStateTest {
                 state.tick(ticksPerIteration);
             }
             assertEquals(nextFrame, state.startIndex());
-            assertEquals(nextFrame, state.endIndex());
+            assertEquals((nextFrame + 1) % frames, state.endIndex());
             assertEquals(0, state.frameTicks());
             assertEquals(frameLength, state.frameMaxTime());
             assertEquals(frameLength * nextFrame, state.ticks());
@@ -211,7 +211,7 @@ public class AnimationStateTest {
         }
 
         assertEquals(2, state.startIndex());
-        assertEquals(2, state.endIndex());
+        assertEquals(3, state.endIndex());
         assertEquals(0, state.frameTicks());
         assertEquals(30, state.frameMaxTime());
         assertEquals(30, state.ticks());
@@ -229,7 +229,7 @@ public class AnimationStateTest {
         }
 
         assertEquals(0, state.startIndex());
-        assertEquals(0, state.endIndex());
+        assertEquals(1, state.endIndex());
         assertEquals(0, state.frameTicks());
         assertEquals(frameLength, state.frameMaxTime());
         assertEquals(frames * frameLength, state.ticks());

@@ -18,6 +18,19 @@ subprojects {
         modLocalRuntime.extendsFrom modCompileOnly
     }
 
+    def lwjglNatives
+    switch (org.gradle.internal.os.OperatingSystem.current()) {
+        case org.gradle.internal.os.OperatingSystem.LINUX:
+            lwjglNatives = "natives-linux"
+            break
+        case org.gradle.internal.os.OperatingSystem.MAC_OS:
+            lwjglNatives = "natives-macos"
+            break
+        case org.gradle.internal.os.OperatingSystem.WINDOWS:
+            lwjglNatives = "natives-windows"
+            break
+    }
+
     dependencies {
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
         mappings loom.officialMojangMappings()
@@ -25,6 +38,10 @@ subprojects {
         modCompileOnly "io.github.moremcmeta:moremcmeta-${project.name}:${project.moremcmeta_version}"
 
         testImplementation "junit:junit:${project.junit_version}"
+        testImplementation "org.lwjgl:lwjgl:${rootProject.lwjglVersion}"
+        testImplementation "org.lwjgl:lwjgl-stb:${rootProject.lwjglVersion}"
+        testRuntimeOnly "org.lwjgl:lwjgl:${rootProject.lwjglVersion}:${lwjglNatives}"
+        testRuntimeOnly "org.lwjgl:lwjgl-stb::${lwjglNatives}"
     }
 }
 

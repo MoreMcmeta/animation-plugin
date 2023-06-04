@@ -8,7 +8,7 @@ import io.github.moremcmeta.animationplugin.MockMutableFrameView;
 import io.github.moremcmeta.animationplugin.MockPersistentFrameGroup;
 import io.github.moremcmeta.animationplugin.animate.DefaultAlphaInterpolator;
 import io.github.moremcmeta.animationplugin.animate.SmoothAlphaInterpolator;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.ParsedMetadata;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
@@ -25,19 +25,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import static io.github.moremcmeta.animationplugin.animate.AnimationComponentTest.indexToColor;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link AnimationComponentProvider}.
  * @author soir20
  */
 public class AnimationComponentProviderTest {
-    private static final MockMutableFrameGroup MOCK_FRAME_GROUP = new MockMutableFrameGroup(
-            new MockMutableFrameView(0, Pair.of(Color.pack(10, 10, 10, 10), Area.of(Point.pack(0, 1), Point.pack(1, 1)))),
-            new MockMutableFrameView(1, Pair.of(Color.pack(20, 20, 20, 20), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),
-            new MockMutableFrameView(2, Pair.of(Color.pack(30, 30, 30, 30), Area.of(Point.pack(0, 1), Point.pack(9, 19))))
+    private static final Supplier<MockMutableFrameGroup> MOCK_FRAME_GROUP = () -> new MockMutableFrameGroup(
+            new MockMutableFrameView(Pair.of(Color.pack(10, 10, 10, 10), Area.of(Point.pack(0, 1), Point.pack(1, 1)))),
+            new MockMutableFrameView(Pair.of(Color.pack(20, 20, 20, 20), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),
+            new MockMutableFrameView(Pair.of(Color.pack(30, 30, 30, 30), Area.of(Point.pack(0, 1), Point.pack(9, 19))))
     );
     private static final List<IntIntPair> LARGE_MOCK_FRAME_LIST = List.of(
             IntIntPair.of(0, 1),
@@ -63,22 +66,21 @@ public class AnimationComponentProviderTest {
     public void assemble_NullMetadata_NullPointerException() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         expectedException.expect(NullPointerException.class);
-        provider.assemble(null, MOCK_FRAME_GROUP);
+        provider.assemble(null, MOCK_FRAME_GROUP.get());
     }
 
     @Test
     public void assemble_NullFrameGroup_NullPointerException() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         expectedException.expect(NullPointerException.class);
-        provider.assemble(new AnimationMetadata(10, 20, 10, true, false, LARGE_MOCK_FRAME_LIST,
-                0, true, ImmutableList.of()), null);
+        provider.assemble(new AnimationGroupMetadata(10, 20, ImmutableList.of()), null);
     }
 
     @Test
     public void assemble_WrongClassMetadata_IllegalArgException() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         expectedException.expect(IllegalArgumentException.class);
-        provider.assemble(new ParsedMetadata() {}, MOCK_FRAME_GROUP);
+        provider.assemble(new AnalyzedMetadata() {}, MOCK_FRAME_GROUP.get());
     }
 
     @Test
@@ -86,18 +88,23 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
         TextureComponent<CurrentFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
-                        0, false, ImmutableList.of()),
-                MOCK_FRAME_GROUP
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
+                                        0, false, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
             for (int tick = 0; tick < time; tick++) {
-                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
-            assertEquals(indexToColor(expectedFrame % MOCK_FRAME_GROUP.frames()), currentFrameView.color(0, 0));
+            assertEquals(indexToColor(expectedFrame % MOCK_FRAME_GROUP.get().frames()), currentFrameView.color(0, 0));
         }
     }
 
@@ -106,9 +113,14 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, false, LARGE_MOCK_FRAME_LIST,
-                        0, false, ImmutableList.of()),
-                MOCK_FRAME_GROUP
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, 33, true, false, LARGE_MOCK_FRAME_LIST,
+                                        0, false, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
@@ -116,7 +128,7 @@ public class AnimationComponentProviderTest {
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
             int time = LARGE_MOCK_FRAME_LIST.get((expectedFrame - 1) % LARGE_MOCK_FRAME_LIST.size()).rightInt();
             for (int tick = 0; tick < time; tick++) {
-                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
             assertEquals(
                     indexToColor(LARGE_MOCK_FRAME_LIST.get(expectedFrame % LARGE_MOCK_FRAME_LIST.size()).leftInt()),
@@ -130,9 +142,14 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, false, SMALL_MOCK_FRAME_LIST,
-                        0, false, ImmutableList.of()),
-                MOCK_FRAME_GROUP
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, 33, true, false, SMALL_MOCK_FRAME_LIST,
+                                        0, false, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
@@ -140,7 +157,7 @@ public class AnimationComponentProviderTest {
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
             int time = SMALL_MOCK_FRAME_LIST.get((expectedFrame - 1) % SMALL_MOCK_FRAME_LIST.size()).rightInt();
             for (int tick = 0; tick < time; tick++) {
-                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
             assertEquals(
                     indexToColor(SMALL_MOCK_FRAME_LIST.get(expectedFrame % SMALL_MOCK_FRAME_LIST.size()).leftInt()),
@@ -154,18 +171,23 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
         TextureComponent<CurrentFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
-                        0, true, ImmutableList.of()),
-                MOCK_FRAME_GROUP
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
+                                        0, true, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
             for (int tick = 0; tick < time; tick++) {
-                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
-            assertEquals(indexToColor(expectedFrame % MOCK_FRAME_GROUP.frames()), currentFrameView.color(0, 0));
+            assertEquals(indexToColor(expectedFrame % MOCK_FRAME_GROUP.get().frames()), currentFrameView.color(0, 0));
         }
     }
 
@@ -174,9 +196,14 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, false, LARGE_MOCK_FRAME_LIST,
-                        0, true, ImmutableList.of()),
-                MOCK_FRAME_GROUP
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, 33, true, false, LARGE_MOCK_FRAME_LIST,
+                                        0, true, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
@@ -184,7 +211,7 @@ public class AnimationComponentProviderTest {
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
             int time = LARGE_MOCK_FRAME_LIST.get((expectedFrame - 1) % LARGE_MOCK_FRAME_LIST.size()).rightInt();
             for (int tick = 0; tick < time; tick++) {
-                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
             assertEquals(
                     indexToColor(LARGE_MOCK_FRAME_LIST.get(expectedFrame % LARGE_MOCK_FRAME_LIST.size()).leftInt()),
@@ -198,9 +225,14 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
 
         TextureComponent<CurrentFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, 33, true, false, SMALL_MOCK_FRAME_LIST,
-                        0, true, ImmutableList.of()),
-                MOCK_FRAME_GROUP
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, 33, true, false, SMALL_MOCK_FRAME_LIST,
+                                        0, true, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
@@ -208,7 +240,7 @@ public class AnimationComponentProviderTest {
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
             int time = SMALL_MOCK_FRAME_LIST.get((expectedFrame - 1) % SMALL_MOCK_FRAME_LIST.size()).rightInt();
             for (int tick = 0; tick < time; tick++) {
-                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+                component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
             assertEquals(
                     indexToColor(SMALL_MOCK_FRAME_LIST.get(expectedFrame % SMALL_MOCK_FRAME_LIST.size()).leftInt()),
@@ -220,7 +252,7 @@ public class AnimationComponentProviderTest {
     @Test
     public void assemble_DiffPartsChangedInEachFrame_InterpolateAreaCombined() {
         checkChangedPoints(
-                MOCK_FRAME_GROUP,
+                MOCK_FRAME_GROUP.get(),
                 Set.of(Point.pack(0, 1), Point.pack(1, 1), Point.pack(0, 0), Point.pack(9, 19))
         );
     }
@@ -229,9 +261,9 @@ public class AnimationComponentProviderTest {
     public void assemble_DiffRgbButAlphaZero_InvisibleColorsIgnored() {
         checkChangedPoints(
                 new MockMutableFrameGroup(
-                        new MockMutableFrameView(0, Pair.of(Color.pack(10, 10, 10, 0), Area.of(Point.pack(0, 1), Point.pack(1, 1)))),
-                        new MockMutableFrameView(1, Pair.of(Color.pack(20, 20, 20, 0), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),
-                        new MockMutableFrameView(2, Pair.of(Color.pack(10, 10, 10, 30), Area.of(Point.pack(0, 1), Point.pack(9, 19))))
+                        new MockMutableFrameView(Pair.of(Color.pack(10, 10, 10, 0), Area.of(Point.pack(0, 1), Point.pack(1, 1)))),
+                        new MockMutableFrameView(Pair.of(Color.pack(20, 20, 20, 0), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),
+                        new MockMutableFrameView(Pair.of(Color.pack(10, 10, 10, 30), Area.of(Point.pack(0, 1), Point.pack(9, 19))))
                 ),
                 Set.of(Point.pack(0, 1), Point.pack(9, 19))
         );
@@ -241,9 +273,9 @@ public class AnimationComponentProviderTest {
     public void assemble_AllColorsTheSame_NoPointsFound() {
         checkChangedPoints(
                 new MockMutableFrameGroup(
-                        new MockMutableFrameView(0, Color.pack(10, 10, 10, 10)),
-                        new MockMutableFrameView(1, Color.pack(10, 10, 10, 10)),
-                        new MockMutableFrameView(2, Color.pack(10, 10, 10, 10))
+                        new MockMutableFrameView(Color.pack(10, 10, 10, 10)),
+                        new MockMutableFrameView(Color.pack(10, 10, 10, 10)),
+                        new MockMutableFrameView(Color.pack(10, 10, 10, 10))
                 ),
                 Set.of()
         );
@@ -259,20 +291,51 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
+    public void assemble_InterpolationDisabled_NoInterpolation() {
+        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+        int time = 33;
+        TextureComponent<CurrentFrameView> component = provider.assemble(
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, time, false, false, ImmutableList.of(),
+                                        0, false, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
+        );
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+
+        for (int tick = 1; tick < time; tick++) {
+            component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
+            assertEquals(
+                    indexToColor(0),
+                    currentFrameView.color(0, 1)
+            );
+        }
+    }
+
+    @Test
     public void assemble_AlphaSmoothDisabled_AlphaNotSmoothed() {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
         TextureComponent<CurrentFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
-                        0, false, ImmutableList.of()),
-                MOCK_FRAME_GROUP
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
+                                        0, false, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
         DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
 
         for (int tick = 1; tick < time; tick++) {
-            component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+            component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             assertEquals(
                     interpolator.interpolate(time, tick, indexToColor(0), indexToColor(1)),
                     currentFrameView.color(0, 1)
@@ -285,16 +348,21 @@ public class AnimationComponentProviderTest {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
         TextureComponent<CurrentFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, time, true, true, ImmutableList.of(),
-                        0, false, ImmutableList.of()),
-                MOCK_FRAME_GROUP
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, time, true, true, ImmutableList.of(),
+                                        0, false, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
         );
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
         SmoothAlphaInterpolator interpolator = new SmoothAlphaInterpolator();
 
         for (int tick = 1; tick < time; tick++) {
-            component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.frames()));
+            component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             assertEquals(
                     interpolator.interpolate(time, tick, indexToColor(0), indexToColor(1)),
                     currentFrameView.color(0, 1)
@@ -302,12 +370,223 @@ public class AnimationComponentProviderTest {
         }
     }
 
+    @Test
+    public void assemble_AnimationHasMultipleParts_PartsAppliedInSizeOrderBeforeTicks() {
+        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+        MockMutableFrameGroup frameGroup = MOCK_FRAME_GROUP.get();
+
+        int time = 33;
+        provider.assemble(
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(
+                                        5, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 2, 1,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(14),
+                                                (x, y) -> indexToColor(15)
+                                        )),
+                                        () -> {}
+                                ),
+                                new AnimationMetadata(
+                                        3, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 3, 3,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(16),
+                                                (x, y) -> indexToColor(17)
+                                        )),
+                                        () -> {}
+                                ),
+                                new AnimationMetadata(
+                                        5, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 1, 2,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(12),
+                                                (x, y) -> indexToColor(13)
+                                        )),
+                                        () -> {}
+                                ),
+                                new AnimationMetadata(
+                                        5, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 1, 1,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(10),
+                                                (x, y) -> indexToColor(11)
+                                        )),
+                                        () -> {}
+                                )
+                        )
+                ),
+                frameGroup
+        );
+
+        MockMutableFrameView firstFrame = ((MockMutableFrameView) frameGroup.frame(0));
+        assertEquals(
+                indexToColor(10),
+                firstFrame.color(1, 1)
+        );
+        assertEquals(
+                indexToColor(12),
+                firstFrame.color(1, 2)
+        );
+        assertEquals(
+                indexToColor(14),
+                firstFrame.color(2, 1)
+        );
+        assertEquals(
+                indexToColor(16),
+                firstFrame.color(4, 4)
+        );
+    }
+
+    @Test
+    public void assemble_AnimationHasMultipleParts_PartsAppliedInSizeOrderAfterTicks() {
+        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+        int time = 33;
+        TextureComponent<CurrentFrameView> component = provider.assemble(
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(
+                                        5, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 2, 1,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(14),
+                                                (x, y) -> indexToColor(15)
+                                        )),
+                                        () -> {}
+                                ),
+                                new AnimationMetadata(
+                                        3, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 3, 3,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(16),
+                                                (x, y) -> indexToColor(17)
+                                        )),
+                                        () -> {}
+                                ),
+                                new AnimationMetadata(
+                                        5, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 1, 2,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(12),
+                                                (x, y) -> indexToColor(13)
+                                        )),
+                                        () -> {}
+                                ),
+                                new AnimationMetadata(
+                                        5, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 1, 1,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(10),
+                                                (x, y) -> indexToColor(11)
+                                        )),
+                                        () -> {}
+                                )
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
+        );
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        DefaultAlphaInterpolator interpolator = new DefaultAlphaInterpolator();
+
+        for (int tick = 1; tick < time; tick++) {
+            component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
+            assertEquals(
+                    interpolator.interpolate(time, tick, indexToColor(10), indexToColor(11)),
+                    currentFrameView.color(1, 1)
+            );
+            assertEquals(
+                    interpolator.interpolate(time, tick, indexToColor(12), indexToColor(13)),
+                    currentFrameView.color(1, 2)
+            );
+            assertEquals(
+                    interpolator.interpolate(time, tick, indexToColor(14), indexToColor(15)),
+                    currentFrameView.color(2, 1)
+            );
+            assertEquals(
+                    interpolator.interpolate(time, tick, indexToColor(16), indexToColor(17)),
+                    currentFrameView.color(4, 4)
+            );
+        }
+    }
+
+    @Test
+    public void assemble_AnimationHasMultipleParts_AllPartsClosed() {
+        AtomicBoolean closer1 = new AtomicBoolean();
+        AtomicBoolean closer2 = new AtomicBoolean();
+        AtomicBoolean closer3 = new AtomicBoolean();
+        AtomicBoolean closer4 = new AtomicBoolean();
+
+        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+        int time = 33;
+        TextureComponent<CurrentFrameView> component = provider.assemble(
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(
+                                        5, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 2, 1,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(14),
+                                                (x, y) -> indexToColor(15)
+                                        )),
+                                        () -> closer3.set(true)
+                                ),
+                                new AnimationMetadata(
+                                        3, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 3, 3,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(16),
+                                                (x, y) -> indexToColor(17)
+                                        )),
+                                        () -> closer4.set(true)
+                                ),
+                                new AnimationMetadata(
+                                        5, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 1, 2,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(12),
+                                                (x, y) -> indexToColor(13)
+                                        )),
+                                        () -> closer2.set(true)
+                                ),
+                                new AnimationMetadata(
+                                        5, 5, time, true, false, ImmutableList.of(),
+                                        0, false, 1, 1,
+                                        Optional.of(ImmutableList.of(
+                                                (x, y) -> indexToColor(10),
+                                                (x, y) -> indexToColor(11)
+                                        )),
+                                        () -> closer1.set(true)
+                                )
+                        )
+                ),
+                MOCK_FRAME_GROUP.get()
+        );
+
+        MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
+        component.onClose(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
+
+        assertTrue(closer1.get());
+        assertTrue(closer2.get());
+        assertTrue(closer3.get());
+        assertTrue(closer4.get());
+    }
+
     private static void checkChangedPoints(FrameGroup<MutableFrameView> frameGroup, Set<Long> expectedPoints) {
         AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
         int time = 33;
         TextureComponent<CurrentFrameView> component = provider.assemble(
-                new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
-                        0, false, ImmutableList.of()),
+                new AnimationGroupMetadata(
+                        10, 20,
+                        ImmutableList.of(
+                                new AnimationMetadata(10, 20, time, true, false, ImmutableList.of(),
+                                        0, false, 0, 0, Optional.empty(), () -> {})
+                        )
+                ),
                 frameGroup
         );
 

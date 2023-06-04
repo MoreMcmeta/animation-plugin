@@ -1,8 +1,8 @@
 package io.github.moremcmeta.animationplugin;
 
 import io.github.moremcmeta.animationplugin.parse.AnimationComponentProvider;
-import io.github.moremcmeta.animationplugin.parse.AnimationMetadataParser;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
+import io.github.moremcmeta.animationplugin.parse.AnimationMetadataAnalyzer;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 import net.minecraft.client.Minecraft;
 
@@ -15,8 +15,7 @@ import java.util.Optional;
 public class ModConstants {
     public static final String MOD_ID = "moremcmeta_animation_plugin";
     public static final String SECTION_NAME = "animation";
-    public static final String DISPLAY_NAME = "MoreMcmeta Animations";
-    public static final MetadataParser PARSER = new AnimationMetadataParser();
+    public static final MetadataAnalyzer ANALYZER = new AnimationMetadataAnalyzer();
     public static final ComponentProvider COMPONENT_PROVIDER = new AnimationComponentProvider(
             () -> Optional.ofNullable(Minecraft.getInstance().level)
     );

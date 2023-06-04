@@ -51,7 +51,7 @@ public class AnimationState {
      * @return index of the frame to end interpolation at
      */
     public int endIndex() {
-        return ticksInThisFrame == 0 ? currentFrameIndex : (currentFrameIndex + 1) % FRAMES;
+        return (currentFrameIndex + 1) % FRAMES;
     }
 
     /**

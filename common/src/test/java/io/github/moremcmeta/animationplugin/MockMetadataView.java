@@ -1,7 +1,9 @@
 package io.github.moremcmeta.animationplugin;
 
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.NegativeKeyIndexException;
 
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
@@ -101,6 +103,17 @@ public class MockMetadataView implements MetadataView {
     public Optional<Boolean> booleanValue(int index) {
         checkNegativeIndex(index);
         return getValueIfPresent(index, Boolean.class);
+    }
+
+    @Override
+    public Optional<InputStream> byteStreamValue(String key) {
+        return getValueIfPresent(key, InputStream.class);
+    }
+
+    @Override
+    public Optional<InputStream> byteStreamValue(int index) {
+        checkNegativeIndex(index);
+        return getValueIfPresent(index, InputStream.class);
     }
 
     @Override

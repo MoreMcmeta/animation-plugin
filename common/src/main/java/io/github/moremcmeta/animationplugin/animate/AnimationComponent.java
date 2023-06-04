@@ -1,11 +1,9 @@
 package io.github.moremcmeta.animationplugin.animate;
 
 import io.github.moremcmeta.moremcmeta.api.client.texture.CurrentFrameView;
-import io.github.moremcmeta.moremcmeta.api.client.texture.FrameGroup;
-import io.github.moremcmeta.moremcmeta.api.client.texture.PersistentFrameView;
-import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
@@ -13,10 +11,10 @@ import java.util.function.Supplier;
 import static java.util.Objects.requireNonNull;
 
 /**
- * {@link TextureComponent} that animates a texture.
+ * Manages a single animation in a group of animations.
  * @author soir20
  */
-public class AnimationComponent implements TextureComponent<CurrentFrameView> {
+public class AnimationComponent {
     private final AnimationState STATE;
     private final int TICKS_UNTIL_START;
     private final IntUnaryOperator FRAME_INDEX_MAPPER;
@@ -24,9 +22,15 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView> {
     private final Area INTERPOLATE_AREA;
     private final int SYNC_TICKS;
     private final Supplier<Optional<Long>> TIME_GETTER;
+    private final int X_IN_BASE;
+    private final int Y_IN_BASE;
 
-    @Override
-    public void onTick(CurrentFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+    /**
+     * Updates the animation on tick.
+     * @param currentFrame          current frame of the animated texture (to which all animations write)
+     * @param predefinedFrames      predefined frames in the base texture
+     */
+    public void onTick(CurrentFrameView currentFrame, List<Frame> predefinedFrames) {
         Optional<Long> timeOptional = TIME_GETTER.get();
 
         if (timeOptional.isPresent()) {
@@ -41,19 +45,13 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView> {
         int startIndex = FRAME_INDEX_MAPPER.applyAsInt(STATE.startIndex());
         int endIndex = FRAME_INDEX_MAPPER.applyAsInt(STATE.endIndex());
 
-        if (startIndex == endIndex) {
-            currentFrame.replaceWith(startIndex);
-            return;
-        }
-
         currentFrame.generateWith(
                 (overwriteX, overwriteY, dependencyFunction) -> INTERPOLATOR.interpolate(
                         STATE.frameMaxTime(),
                         STATE.frameTicks(),
-                        predefinedFrames.frame(startIndex).color(overwriteX, overwriteY),
-                        predefinedFrames.frame(endIndex).color(overwriteX, overwriteY)
+                        predefinedFrames.get(startIndex).color(overwriteX - X_IN_BASE, overwriteY - Y_IN_BASE),
+                        predefinedFrames.get(endIndex).color(overwriteX - X_IN_BASE, overwriteY - Y_IN_BASE)
                 ),
-                INTERPOLATE_AREA,
                 INTERPOLATE_AREA
         );
     }
@@ -68,10 +66,13 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView> {
      * @param interpolator              interpolates between colors
      * @param syncTicks                 number of ticks to sync to; e.g. 24000 to sync to a Minecraft day
      * @param timeGetter                retrieves the current time in the world, if any
+     * @param xInBase                   x-coordinate of the top-left corner of this animation within the base texture
+     * @param yInBase                   y-coordinate of the top-left corner of this animation within the base texture
      */
     private AnimationComponent(Area interpolateArea, int frames, int ticksUntilStart,
                                IntUnaryOperator frameTimeCalculator, IntUnaryOperator frameIndexMapper,
-                               Interpolator interpolator, int syncTicks, Supplier<Optional<Long>> timeGetter) {
+                               Interpolator interpolator, int syncTicks, Supplier<Optional<Long>> timeGetter,
+                               int xInBase, int yInBase) {
         STATE = new AnimationState(frames, frameTimeCalculator);
         TICKS_UNTIL_START = ticksUntilStart;
         STATE.tick(TICKS_UNTIL_START);
@@ -82,6 +83,9 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView> {
 
         SYNC_TICKS = syncTicks;
         TIME_GETTER = timeGetter;
+
+        X_IN_BASE = xInBase;
+        Y_IN_BASE = yInBase;
     }
 
     /**
@@ -97,6 +101,8 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView> {
         private Interpolator interpolator;
         private int syncTicks = -1;
         private Supplier<Optional<Long>> timeGetter = Optional::empty;
+        private int xInBase;
+        private int yInBase;
 
         /**
          * Sets the interpolate area for this builder (required).
@@ -181,6 +187,21 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView> {
         }
 
         /**
+         * Sets the coordinate of the top-left corner of this animation within the base texture.
+         * @param x     x-coordinate of the top-left corner of this animation within the base texture
+         * @param y     y-coordinate of the top-left corner of this animation within the base texture
+         * @return this builder
+         */
+        public Builder coordinateInBase(int x, int y) {
+            if (x < 0 || y < 0) {
+                throw new IllegalArgumentException("Coordinate in base cannot be negative: " + ticksUntilStart);
+            }
+            this.xInBase = x;
+            this.yInBase = y;
+            return this;
+        }
+
+        /**
          * Builds an {@link AnimationComponent} from the values provided to the builder. The interpolate area,
          * frames, ticks until start, frame time calculator, frame index mapper, and interpolator must have
          * been provided.
@@ -219,7 +240,9 @@ public class AnimationComponent implements TextureComponent<CurrentFrameView> {
                     frameIndexMapper,
                     interpolator,
                     syncTicks,
-                    timeGetter
+                    timeGetter,
+                    xInBase,
+                    yInBase
             );
         }
 

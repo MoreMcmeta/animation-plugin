@@ -2,7 +2,7 @@ package io.github.moremcmeta.animationplugin.fabric;
 
 import io.github.moremcmeta.animationplugin.ModConstants;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
-import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataParser;
+import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
 import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
 
 /**
@@ -16,8 +16,8 @@ public class AnimationPluginFabric implements MoreMcmetaTexturePlugin {
     }
 
     @Override
-    public MetadataParser parser() {
-        return ModConstants.PARSER;
+    public MetadataAnalyzer analyzer() {
+        return ModConstants.ANALYZER;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class AnimationPluginFabric implements MoreMcmetaTexturePlugin {
     }
 
     @Override
-    public String displayName() {
-        return ModConstants.DISPLAY_NAME;
+    public String id() {
+        return ModConstants.MOD_ID;
     }
 }
