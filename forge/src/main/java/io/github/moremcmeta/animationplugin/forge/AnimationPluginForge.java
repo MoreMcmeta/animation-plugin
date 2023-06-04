@@ -3,7 +3,7 @@ package io.github.moremcmeta.animationplugin.forge;
 import io.github.moremcmeta.animationplugin.ModConstants;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 import io.github.moremcmeta.moremcmeta.forge.api.client.MoreMcmetaClientPlugin;
 
 /**
@@ -24,8 +24,8 @@ public class AnimationPluginForge implements MoreMcmetaTexturePlugin {
     }
 
     @Override
-    public ComponentProvider componentProvider() {
-        return ModConstants.COMPONENT_PROVIDER;
+    public ComponentBuilder componentBuilder() {
+        return ModConstants.COMPONENT_BUILDER;
     }
 
     @Override

@@ -34,7 +34,7 @@ public class AnimationGroupComponent implements TextureComponent<CurrentFrameVie
     }
 
     @Override
-    public void onTick(CurrentFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+    public void onTick(CurrentFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {
         if (predefinedFrameCache == null) {
             predefinedFrameCache = wrapFrames(predefinedFrames);
         }
@@ -48,7 +48,7 @@ public class AnimationGroupComponent implements TextureComponent<CurrentFrameVie
     }
 
     @Override
-    public void onClose(CurrentFrameView currentFrame, FrameGroup<PersistentFrameView> predefinedFrames) {
+    public void onClose(CurrentFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {
         RESOURCE_CLOSERS.forEach(Runnable::run);
     }
 
@@ -57,7 +57,7 @@ public class AnimationGroupComponent implements TextureComponent<CurrentFrameVie
      * @param frames    frames to wrap
      * @return wrapped frames
      */
-    private static List<Frame> wrapFrames(FrameGroup<PersistentFrameView> frames) {
+    private static List<Frame> wrapFrames(FrameGroup<? extends PersistentFrameView> frames) {
         List<Frame> wrappedFrames = new ArrayList<>();
         for (int index = 0; index < frames.frames(); index++) {
             wrappedFrames.add(frames.frame(index)::color);

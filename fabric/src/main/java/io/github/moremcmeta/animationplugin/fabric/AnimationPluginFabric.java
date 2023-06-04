@@ -3,7 +3,7 @@ package io.github.moremcmeta.animationplugin.fabric;
 import io.github.moremcmeta.animationplugin.ModConstants;
 import io.github.moremcmeta.moremcmeta.api.client.MoreMcmetaTexturePlugin;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
-import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentProvider;
+import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
 
 /**
  * Implementation of the animation plugin on Fabric.
@@ -21,8 +21,8 @@ public class AnimationPluginFabric implements MoreMcmetaTexturePlugin {
     }
 
     @Override
-    public ComponentProvider componentProvider() {
-        return ModConstants.COMPONENT_PROVIDER;
+    public ComponentBuilder componentBuilder() {
+        return ModConstants.COMPONENT_BUILDER;
     }
 
     @Override

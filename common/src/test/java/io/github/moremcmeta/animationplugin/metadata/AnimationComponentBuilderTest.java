@@ -33,10 +33,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests the {@link AnimationComponentProvider}.
+ * Tests the {@link AnimationComponentBuilder}.
  * @author soir20
  */
-public class AnimationComponentProviderTest {
+public class AnimationComponentBuilderTest {
     private static final Supplier<MockMutableFrameGroup> MOCK_FRAME_GROUP = () -> new MockMutableFrameGroup(
             new MockMutableFrameView(Pair.of(Color.pack(10, 10, 10, 10), Area.of(Point.pack(0, 1), Point.pack(1, 1)))),
             new MockMutableFrameView(Pair.of(Color.pack(20, 20, 20, 20), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),
@@ -59,35 +59,35 @@ public class AnimationComponentProviderTest {
     @Test
     public void construct_NullLevelSupplier_NullPointerException() {
         expectedException.expect(NullPointerException.class);
-        new AnimationComponentProvider(null);
+        new AnimationComponentBuilder(null);
     }
 
     @Test
-    public void assemble_NullMetadata_NullPointerException() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_NullMetadata_NullPointerException() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         expectedException.expect(NullPointerException.class);
-        provider.assemble(null, MOCK_FRAME_GROUP.get());
+        builder.build(null, MOCK_FRAME_GROUP.get());
     }
 
     @Test
-    public void assemble_NullFrameGroup_NullPointerException() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_NullFrameGroup_NullPointerException() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         expectedException.expect(NullPointerException.class);
-        provider.assemble(new AnimationGroupMetadata(10, 20, ImmutableList.of()), null);
+        builder.build(new AnimationGroupMetadata(10, 20, ImmutableList.of()), null);
     }
 
     @Test
-    public void assemble_WrongClassMetadata_IllegalArgException() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_WrongClassMetadata_IllegalArgException() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         expectedException.expect(IllegalArgumentException.class);
-        provider.assemble(new AnalyzedMetadata() {}, MOCK_FRAME_GROUP.get());
+        builder.build(new AnalyzedMetadata() {}, MOCK_FRAME_GROUP.get());
     }
 
     @Test
-    public void assemble_NotSyncedNoPredefinedFrames_DefaultFrameTimeUsed() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_NotSyncedNoPredefinedFrames_DefaultFrameTimeUsed() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -109,10 +109,10 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_NotSyncedHasMorePredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_NotSyncedHasMorePredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
 
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -138,10 +138,10 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_NotSyncedHasFewerPredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_NotSyncedHasFewerPredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
 
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -167,10 +167,10 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_SyncedNoPredefinedFrames_DefaultFrameTimeUsed() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_SyncedNoPredefinedFrames_DefaultFrameTimeUsed() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -192,10 +192,10 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_SyncedHasMorePredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_SyncedHasMorePredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
 
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -221,10 +221,10 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_SyncedHasFewerPredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_SyncedHasFewerPredefinedFramesThanActualFrames_PredefinedFrameTimeUsed() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
 
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -250,7 +250,7 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_DiffPartsChangedInEachFrame_InterpolateAreaCombined() {
+    public void build_DiffPartsChangedInEachFrame_InterpolateAreaCombined() {
         checkChangedPoints(
                 MOCK_FRAME_GROUP.get(),
                 Set.of(Point.pack(0, 1), Point.pack(1, 1), Point.pack(0, 0), Point.pack(9, 19))
@@ -258,7 +258,7 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_DiffRgbButAlphaZero_InvisibleColorsIgnored() {
+    public void build_DiffRgbButAlphaZero_InvisibleColorsIgnored() {
         checkChangedPoints(
                 new MockMutableFrameGroup(
                         new MockMutableFrameView(Pair.of(Color.pack(10, 10, 10, 0), Area.of(Point.pack(0, 1), Point.pack(1, 1)))),
@@ -270,7 +270,7 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_AllColorsTheSame_NoPointsFound() {
+    public void build_AllColorsTheSame_NoPointsFound() {
         checkChangedPoints(
                 new MockMutableFrameGroup(
                         new MockMutableFrameView(Color.pack(10, 10, 10, 10)),
@@ -282,7 +282,7 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_NoFrames_IllegalArgExceptionFromState() {
+    public void build_NoFrames_IllegalArgExceptionFromState() {
         expectedException.expect(IllegalArgumentException.class);
         checkChangedPoints(
                 new MockMutableFrameGroup(),
@@ -291,10 +291,10 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_InterpolationDisabled_NoInterpolation() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_InterpolationDisabled_NoInterpolation() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -317,10 +317,10 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_AlphaSmoothDisabled_AlphaNotSmoothed() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_AlphaSmoothDisabled_AlphaNotSmoothed() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -344,10 +344,10 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_AlphaSmoothEnabled_AlphaSmoothed() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_AlphaSmoothEnabled_AlphaSmoothed() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -371,12 +371,12 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_AnimationHasMultipleParts_PartsAppliedInSizeOrderBeforeTicks() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_AnimationHasMultipleParts_PartsAppliedInSizeOrderBeforeTicks() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         MockMutableFrameGroup frameGroup = MOCK_FRAME_GROUP.get();
 
         int time = 33;
-        provider.assemble(
+        builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -441,10 +441,10 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_AnimationHasMultipleParts_PartsAppliedInSizeOrderAfterTicks() {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+    public void build_AnimationHasMultipleParts_PartsAppliedInSizeOrderAfterTicks() {
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -514,15 +514,15 @@ public class AnimationComponentProviderTest {
     }
 
     @Test
-    public void assemble_AnimationHasMultipleParts_AllPartsClosed() {
+    public void build_AnimationHasMultipleParts_AllPartsClosed() {
         AtomicBoolean closer1 = new AtomicBoolean();
         AtomicBoolean closer2 = new AtomicBoolean();
         AtomicBoolean closer3 = new AtomicBoolean();
         AtomicBoolean closer4 = new AtomicBoolean();
 
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
@@ -577,9 +577,9 @@ public class AnimationComponentProviderTest {
     }
 
     private static void checkChangedPoints(FrameGroup<MutableFrameView> frameGroup, Set<Long> expectedPoints) {
-        AnimationComponentProvider provider = new AnimationComponentProvider(Optional::empty);
+        AnimationComponentBuilder builder = new AnimationComponentBuilder(Optional::empty);
         int time = 33;
-        TextureComponent<CurrentFrameView> component = provider.assemble(
+        TextureComponent<? super CurrentFrameView> component = builder.build(
                 new AnimationGroupMetadata(
                         10, 20,
                         ImmutableList.of(
