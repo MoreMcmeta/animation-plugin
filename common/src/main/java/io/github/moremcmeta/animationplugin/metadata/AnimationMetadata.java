@@ -1,4 +1,4 @@
-package io.github.moremcmeta.animationplugin.parse;
+package io.github.moremcmeta.animationplugin.metadata;
 
 import com.google.common.collect.ImmutableList;
 import io.github.moremcmeta.animationplugin.animate.Frame;

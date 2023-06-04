@@ -1,4 +1,4 @@
-package io.github.moremcmeta.animationplugin.parse;
+package io.github.moremcmeta.animationplugin.metadata;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.animationplugin.animate.AnimationComponent;

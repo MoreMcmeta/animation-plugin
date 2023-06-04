@@ -1,4 +1,4 @@
-package io.github.moremcmeta.animationplugin.parse;
+package io.github.moremcmeta.animationplugin.metadata;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.NativeImage;

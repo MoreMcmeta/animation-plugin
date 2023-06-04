@@ -1,4 +1,4 @@
-package io.github.moremcmeta.animationplugin.parse;
+package io.github.moremcmeta.animationplugin.metadata;
 
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 
