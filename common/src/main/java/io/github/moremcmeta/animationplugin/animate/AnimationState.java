@@ -25,7 +25,7 @@ import static java.util.Objects.requireNonNull;
  * Keeps track of the current frame in an animation.
  * @author soir20
  */
-public class AnimationState {
+public final class AnimationState {
     private final int FRAMES;
     private final IntUnaryOperator FRAME_TIME_CALCULATOR;
 

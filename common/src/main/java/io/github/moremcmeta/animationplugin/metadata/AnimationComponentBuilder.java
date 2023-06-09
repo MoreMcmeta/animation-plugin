@@ -51,7 +51,7 @@ import static java.util.Objects.requireNonNull;
  * Generates {@link AnimationComponent}s from {@link AnimationMetadata}.
  * @author soir20
  */
-public class AnimationComponentBuilder implements ComponentBuilder {
+public final class AnimationComponentBuilder implements ComponentBuilder {
     private static final int TICKS_PER_DAY = 24000;
     private static final WobbleFunction WOBBLE_FUNCTION = new WobbleFunction();
 

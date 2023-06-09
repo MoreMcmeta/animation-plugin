@@ -26,7 +26,7 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.ComponentBuilder;
  * Implementation of the animation plugin on Fabric.
  * @author soir20
  */
-public class AnimationPluginFabric implements MoreMcmetaTexturePlugin {
+public final class AnimationPluginFabric implements MoreMcmetaTexturePlugin {
     @Override
     public String sectionName() {
         return ModConstants.SECTION_NAME;

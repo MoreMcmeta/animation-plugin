@@ -29,7 +29,7 @@ import java.util.List;
  * Mock implementation of {@link FrameGroup}.
  * @author soir20
  */
-public class MockPersistentFrameGroup implements FrameGroup<PersistentFrameView> {
+public final class MockPersistentFrameGroup implements FrameGroup<PersistentFrameView> {
     private final List<PersistentFrameView> FRAMES;
 
     public MockPersistentFrameGroup(int frames) {

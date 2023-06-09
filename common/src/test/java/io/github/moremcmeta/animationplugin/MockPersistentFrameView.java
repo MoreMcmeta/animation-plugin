@@ -25,7 +25,7 @@ import static io.github.moremcmeta.animationplugin.animate.AnimationComponentTes
  * Mock implementation of {@link PersistentFrameView}.
  * @author soir20
  */
-public class MockPersistentFrameView implements PersistentFrameView {
+public final class MockPersistentFrameView implements PersistentFrameView {
     private final int INDEX;
 
     public MockPersistentFrameView(int index) {

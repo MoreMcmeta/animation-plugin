@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  * Tests the {@link SmoothAlphaInterpolator}.
  * @author soir20
  */
-public class SmoothAlphaInterpolatorTest {
+public final class SmoothAlphaInterpolatorTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

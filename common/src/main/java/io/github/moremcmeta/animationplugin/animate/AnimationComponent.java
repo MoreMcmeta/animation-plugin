@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  * Manages a single animation in a group of animations.
  * @author soir20
  */
-public class AnimationComponent {
+public final class AnimationComponent {
     private final AnimationState STATE;
     private final int TICKS_UNTIL_START;
     private final IntUnaryOperator FRAME_INDEX_MAPPER;
@@ -109,7 +109,7 @@ public class AnimationComponent {
      * Builder to create new {@link AnimationComponent}s.
      * @author soir20
      */
-    public static class Builder {
+    public static final class Builder {
         private Area interpolateArea;
         private int frames = -1;
         private int ticksUntilStart = -1;

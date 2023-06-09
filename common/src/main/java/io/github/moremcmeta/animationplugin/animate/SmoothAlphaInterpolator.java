@@ -24,7 +24,7 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
  * transition in alpha values between the start color and end color.
  * @author soir20
  */
-public class SmoothAlphaInterpolator extends RGBAInterpolator {
+public final class SmoothAlphaInterpolator extends RGBAInterpolator {
 
     @Override
     protected int mixAlpha(double startProportion, int startColor, int endColor) {

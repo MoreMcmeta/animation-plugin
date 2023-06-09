@@ -25,7 +25,7 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.Color;
  * start color and ignores the end color).
  * @author soir20
  */
-public class DefaultAlphaInterpolator extends RGBAInterpolator {
+public final class DefaultAlphaInterpolator extends RGBAInterpolator {
 
     @Override
     protected int mixAlpha(double startProportion, int startColor, int endColor) {

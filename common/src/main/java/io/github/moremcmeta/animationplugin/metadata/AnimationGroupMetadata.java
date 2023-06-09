@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * Holds all {@link AnimationMetadata} for animations within the same texture.
  * @author soir20
  */
-public class AnimationGroupMetadata implements AnalyzedMetadata {
+public final class AnimationGroupMetadata implements AnalyzedMetadata {
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;
     private final List<AnimationMetadata> PARTS;

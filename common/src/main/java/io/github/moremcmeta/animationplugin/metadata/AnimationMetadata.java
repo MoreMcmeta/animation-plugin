@@ -30,7 +30,7 @@ import static java.util.Objects.requireNonNull;
  * Contains animation metadata that has been parsed.
  * @author soir20
  */
-public class AnimationMetadata {
+public final class AnimationMetadata {
     private final int FRAME_WIDTH;
     private final int FRAME_HEIGHT;
     private final int DEFAULT_TIME;

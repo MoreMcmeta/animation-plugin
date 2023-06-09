@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
  * Tests the {@link WobbleFunction}.
  * @author soir20
  */
-public class WobbleFunctionTest {
+public final class WobbleFunctionTest {
 
     @Test
     public void calculate_DaytimeNegative_CorrectLateTime() {

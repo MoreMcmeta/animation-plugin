@@ -39,7 +39,7 @@ import static java.util.Objects.requireNonNull;
  * Parses animation metadata into {@link AnimationMetadata}s.
  * @author soir20
  */
-public class AnimationMetadataAnalyzer implements MetadataAnalyzer {
+public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
 
     @Override
     public AnalyzedMetadata analyze(MetadataView metadata, int imageWidth, int imageHeight) throws InvalidMetadataException {

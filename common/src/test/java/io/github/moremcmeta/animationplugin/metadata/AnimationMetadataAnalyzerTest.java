@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link AnimationMetadataAnalyzer}.
  * @author soir20
  */
-public class AnimationMetadataAnalyzerTest {
+public final class AnimationMetadataAnalyzerTest {
     private static final AnimationMetadataAnalyzer ANALYZER = new AnimationMetadataAnalyzer();
     @SuppressWarnings("resource")
     private static final BiFunction<Integer, Integer, InputStream> MOCK_TEXTURE = (w, h) -> {

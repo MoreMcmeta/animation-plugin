@@ -26,7 +26,7 @@ import java.util.Random;
  * for all animated textures.
  * @author soir20
  */
-public class WobbleFunction {
+public final class WobbleFunction {
     private static final long TICKS_PER_MC_DAY = 24000;
     private final Random RANDOM_GENERATOR;
 

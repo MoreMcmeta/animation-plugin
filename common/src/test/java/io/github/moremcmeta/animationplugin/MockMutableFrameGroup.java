@@ -29,7 +29,7 @@ import java.util.List;
  * Mock implementation of a {@link FrameGroup} for {@link MutableFrameView}s.
  * @author soir20
  */
-public class MockMutableFrameGroup implements FrameGroup<MutableFrameView> {
+public final class MockMutableFrameGroup implements FrameGroup<MutableFrameView> {
     private final List<MutableFrameView> FRAMES;
 
     public MockMutableFrameGroup(MockMutableFrameView... frames) {

@@ -30,7 +30,7 @@ import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
  * Mock implementation of a {@link MutableFrameView}.
  * @author soir20
  */
-public class MockMutableFrameView implements MutableFrameView {
+public final class MockMutableFrameView implements MutableFrameView {
     private final int WIDTH = 10;
     private final int HEIGHT = 20;
     private final int[][] PIXELS = new int[HEIGHT][WIDTH];

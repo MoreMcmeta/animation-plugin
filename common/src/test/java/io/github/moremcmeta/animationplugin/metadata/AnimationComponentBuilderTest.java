@@ -53,7 +53,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link AnimationComponentBuilder}.
  * @author soir20
  */
-public class AnimationComponentBuilderTest {
+public final class AnimationComponentBuilderTest {
     private static final Supplier<MockMutableFrameGroup> MOCK_FRAME_GROUP = () -> new MockMutableFrameGroup(
             new MockMutableFrameView(Pair.of(Color.pack(10, 10, 10, 10), Area.of(Point.pack(0, 1), Point.pack(1, 1)))),
             new MockMutableFrameView(Pair.of(Color.pack(20, 20, 20, 20), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),

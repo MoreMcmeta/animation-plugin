@@ -29,7 +29,7 @@ import java.util.Optional;
  * Constants for both Fabric and Forge implementations of the plugin.
  * @author soir20
  */
-public class ModConstants {
+public final class ModConstants {
     public static final String MOD_ID = "moremcmeta_animation_plugin";
     public static final String SECTION_NAME = "animation";
     public static final MetadataAnalyzer ANALYZER = new AnimationMetadataAnalyzer();

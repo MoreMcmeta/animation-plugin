@@ -28,7 +28,7 @@ import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
  * Mock implementation of {@link CurrentFrameView}.
  * @author soir20
  */
-public class MockCurrentFrameView implements CurrentFrameView {
+public final class MockCurrentFrameView implements CurrentFrameView {
     private final int WIDTH = 10;
     private final int HEIGHT = 20;
     private final int[][] PIXELS;

@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
  * Tests the {@link AnimationGroupComponent}.
  * @author soir20
  */
-public class AnimationGroupComponentTest {
+public final class AnimationGroupComponentTest {
     private static final Interpolator INTERPOLATOR = new DefaultAlphaInterpolator();
 
     @Rule

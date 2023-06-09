@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  * Tests the {@link AnimationState}.
  * @author soir20
  */
-public class AnimationStateTest {
+public final class AnimationStateTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 

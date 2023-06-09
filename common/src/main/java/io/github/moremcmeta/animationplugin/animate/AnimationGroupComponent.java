@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * Updates several separate animations within one texture.
  * @author soir20
  */
-public class AnimationGroupComponent implements TextureComponent<CurrentFrameView> {
+public final class AnimationGroupComponent implements TextureComponent<CurrentFrameView> {
     private final Collection<Pair<AnimationComponent, Optional<List<Frame>>>> COMPONENTS;
     private final Collection<Runnable> RESOURCE_CLOSERS;
     private List<Frame> predefinedFrameCache;
