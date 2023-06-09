@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Mock implementation of {@link MetadataView} that contains no data.
+ * Mock implementation of {@link MetadataView} that contains the given data.
  * @author soir20
  */
 public class MockMetadataView implements MetadataView {
