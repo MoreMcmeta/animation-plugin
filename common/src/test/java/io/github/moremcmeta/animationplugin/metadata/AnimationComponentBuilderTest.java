@@ -33,7 +33,6 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
-import it.unimi.dsi.fastutil.ints.IntIntPair;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -59,15 +58,15 @@ public final class AnimationComponentBuilderTest {
             new MockMutableFrameView(Pair.of(Color.pack(20, 20, 20, 20), Area.of(Point.pack(0, 1), Point.pack(0, 0)))),
             new MockMutableFrameView(Pair.of(Color.pack(30, 30, 30, 30), Area.of(Point.pack(0, 1), Point.pack(9, 19))))
     );
-    private static final List<IntIntPair> LARGE_MOCK_FRAME_LIST = List.of(
-            IntIntPair.of(0, 1),
-            IntIntPair.of(2, 5),
-            IntIntPair.of(1, 27),
-            IntIntPair.of(2, 3)
+    private static final List<Pair<Integer, Integer>> LARGE_MOCK_FRAME_LIST = List.of(
+            Pair.of(0, 1),
+            Pair.of(2, 5),
+            Pair.of(1, 27),
+            Pair.of(2, 3)
     );
-    private static final List<IntIntPair> SMALL_MOCK_FRAME_LIST = List.of(
-            IntIntPair.of(2, 5),
-            IntIntPair.of(0, 1)
+    private static final List<Pair<Integer, Integer>> SMALL_MOCK_FRAME_LIST = List.of(
+            Pair.of(2, 5),
+            Pair.of(0, 1)
     );
 
     @Rule
@@ -143,12 +142,12 @@ public final class AnimationComponentBuilderTest {
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
-            int time = LARGE_MOCK_FRAME_LIST.get((expectedFrame - 1) % LARGE_MOCK_FRAME_LIST.size()).rightInt();
+            int time = LARGE_MOCK_FRAME_LIST.get((expectedFrame - 1) % LARGE_MOCK_FRAME_LIST.size()).getSecond();
             for (int tick = 0; tick < time; tick++) {
                 component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
             assertEquals(
-                    indexToColor(LARGE_MOCK_FRAME_LIST.get(expectedFrame % LARGE_MOCK_FRAME_LIST.size()).leftInt()),
+                    indexToColor(LARGE_MOCK_FRAME_LIST.get(expectedFrame % LARGE_MOCK_FRAME_LIST.size()).getFirst()),
                     currentFrameView.color(0, 0)
             );
         }
@@ -172,12 +171,12 @@ public final class AnimationComponentBuilderTest {
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
-            int time = SMALL_MOCK_FRAME_LIST.get((expectedFrame - 1) % SMALL_MOCK_FRAME_LIST.size()).rightInt();
+            int time = SMALL_MOCK_FRAME_LIST.get((expectedFrame - 1) % SMALL_MOCK_FRAME_LIST.size()).getSecond();
             for (int tick = 0; tick < time; tick++) {
                 component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
             assertEquals(
-                    indexToColor(SMALL_MOCK_FRAME_LIST.get(expectedFrame % SMALL_MOCK_FRAME_LIST.size()).leftInt()),
+                    indexToColor(SMALL_MOCK_FRAME_LIST.get(expectedFrame % SMALL_MOCK_FRAME_LIST.size()).getFirst()),
                     currentFrameView.color(0, 0)
             );
         }
@@ -226,12 +225,12 @@ public final class AnimationComponentBuilderTest {
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
-            int time = LARGE_MOCK_FRAME_LIST.get((expectedFrame - 1) % LARGE_MOCK_FRAME_LIST.size()).rightInt();
+            int time = LARGE_MOCK_FRAME_LIST.get((expectedFrame - 1) % LARGE_MOCK_FRAME_LIST.size()).getSecond();
             for (int tick = 0; tick < time; tick++) {
                 component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
             assertEquals(
-                    indexToColor(LARGE_MOCK_FRAME_LIST.get(expectedFrame % LARGE_MOCK_FRAME_LIST.size()).leftInt()),
+                    indexToColor(LARGE_MOCK_FRAME_LIST.get(expectedFrame % LARGE_MOCK_FRAME_LIST.size()).getFirst()),
                     currentFrameView.color(0, 0)
             );
         }
@@ -255,12 +254,12 @@ public final class AnimationComponentBuilderTest {
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         for (int expectedFrame = 1; expectedFrame < 6; expectedFrame++) {
-            int time = SMALL_MOCK_FRAME_LIST.get((expectedFrame - 1) % SMALL_MOCK_FRAME_LIST.size()).rightInt();
+            int time = SMALL_MOCK_FRAME_LIST.get((expectedFrame - 1) % SMALL_MOCK_FRAME_LIST.size()).getSecond();
             for (int tick = 0; tick < time; tick++) {
                 component.onTick(currentFrameView, new MockPersistentFrameGroup(MOCK_FRAME_GROUP.get().frames()));
             }
             assertEquals(
-                    indexToColor(SMALL_MOCK_FRAME_LIST.get(expectedFrame % SMALL_MOCK_FRAME_LIST.size()).leftInt()),
+                    indexToColor(SMALL_MOCK_FRAME_LIST.get(expectedFrame % SMALL_MOCK_FRAME_LIST.size()).getFirst()),
                     currentFrameView.color(0, 0)
             );
         }

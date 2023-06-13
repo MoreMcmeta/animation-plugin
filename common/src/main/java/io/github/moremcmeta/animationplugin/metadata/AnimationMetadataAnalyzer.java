@@ -19,12 +19,12 @@ package io.github.moremcmeta.animationplugin.metadata;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.animationplugin.animate.Frame;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.AnalyzedMetadata;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
-import it.unimi.dsi.fastutil.ints.IntIntPair;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -155,7 +155,7 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
         boolean daytimeSync = metadata.booleanValue("daytimeSync").orElse(false);
 
         Optional<MetadataView> framesViewOptional = metadata.subView("frames");
-        List<IntIntPair> frames;
+        List<Pair<Integer, Integer>> frames;
         int maxIndex = (imageWidth / frameWidth) * (imageHeight / frameHeight) - 1;
         if (framesViewOptional.isPresent()) {
             frames = parseFrameList(framesViewOptional.get(), defaultTime);
@@ -164,7 +164,7 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
         }
 
         Optional<Integer> outOfBoundsIndex = frames.stream()
-                .map(IntIntPair::firstInt)
+                .map(Pair::getFirst)
                 .filter((index) -> index > maxIndex)
                 .findAny();
         if (outOfBoundsIndex.isPresent()) {
@@ -244,14 +244,14 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
      * @return all frames in the animation as (index, time) pairs
      * @throws InvalidMetadataException if any frames within the array are missing an index
      */
-    private List<IntIntPair> parseFrameList(MetadataView framesView, int defaultTime)
+    private List<Pair<Integer, Integer>> parseFrameList(MetadataView framesView, int defaultTime)
             throws InvalidMetadataException {
-        ImmutableList.Builder<IntIntPair> frames = new ImmutableList.Builder<>();
+        ImmutableList.Builder<Pair<Integer, Integer>> frames = new ImmutableList.Builder<>();
 
         for (int index = 0; index < framesView.size(); index++) {
 
             // Either an integer value is present, or a sub view is present
-            framesView.integerValue(index).ifPresent((frameIndex) -> frames.add(IntIntPair.of(frameIndex, defaultTime)));
+            framesView.integerValue(index).ifPresent((frameIndex) -> frames.add(Pair.of(frameIndex, defaultTime)));
 
             Optional<MetadataView> frameObjOptional = framesView.subView(index);
             if (frameObjOptional.isPresent()) {
@@ -271,7 +271,7 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
      * @return pair of the frame index and its time
      * @throws InvalidMetadataException if the frame index is missing
      */
-    private IntIntPair parseFrameObj(MetadataView frameObj, int defaultTime) throws InvalidMetadataException {
+    private Pair<Integer, Integer> parseFrameObj(MetadataView frameObj, int defaultTime) throws InvalidMetadataException {
         int index = frameObj.integerValue("index").orElseThrow(
                 () -> new InvalidMetadataException("Missing required property \"index\" for")
         );
@@ -284,7 +284,7 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
             throw new InvalidMetadataException("Frame time must be greater than zero, but was " + frameTime);
         }
 
-        return IntIntPair.of(index, frameTime);
+        return Pair.of(index, frameTime);
     }
 
 }

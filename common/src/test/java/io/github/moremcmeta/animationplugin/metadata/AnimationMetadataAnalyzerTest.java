@@ -19,10 +19,10 @@ package io.github.moremcmeta.animationplugin.metadata;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.animationplugin.MockMetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
-import it.unimi.dsi.fastutil.ints.IntIntPair;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -373,7 +373,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(IntIntPair.of(5, 1), IntIntPair.of(2, 1), IntIntPair.of(0, 1)),
+                List.of(Pair.of(5, 1), Pair.of(2, 1), Pair.of(0, 1)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -412,7 +412,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 4), IntIntPair.of(0, 7)),
+                List.of(Pair.of(5, 12), Pair.of(2, 4), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -520,7 +520,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 1), IntIntPair.of(0, 7)),
+                List.of(Pair.of(5, 12), Pair.of(2, 1), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -541,7 +541,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 13), IntIntPair.of(0, 7)),
+                List.of(Pair.of(5, 12), Pair.of(2, 13), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -562,7 +562,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 13), IntIntPair.of(0, 7)),
+                List.of(Pair.of(5, 12), Pair.of(2, 13), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -584,7 +584,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 13), IntIntPair.of(8, 2)),
+                List.of(Pair.of(5, 12), Pair.of(2, 13), Pair.of(8, 2)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -637,21 +637,23 @@ public final class AnimationMetadataAnalyzerTest {
     @Test
     public void analyze_NoPartsAllFieldsPresent_AllUsed() throws InvalidMetadataException {
         MetadataView metadataView = new MockMetadataView(
-                ImmutableMap.of(
-                        "width", 18,
-                        "height", 27,
-                        "frametime", 5,
-                        "interpolate", true,
-                        "smoothAlpha", true,
-                        "daytimeSync", false,
-                        "frames",
-                        new MockMetadataView(ImmutableMap.of(
-                                "0", new MockMetadataView(ImmutableMap.of("index", 5, "time", 12)),
-                                "1", 2,
-                                "2", new MockMetadataView(ImmutableMap.of("index", 0, "time", 7))
-                        )),
-                        "skip", 12
-                )
+                new ImmutableMap.Builder<String, Object>()
+                        .put("width", 18)
+                        .put("height", 27)
+                        .put("frametime", 5)
+                        .put("interpolate", true)
+                        .put("smoothAlpha", true)
+                        .put("daytimeSync", false)
+                        .put(
+                                "frames",
+                                new MockMetadataView(ImmutableMap.of(
+                                        "0", new MockMetadataView(ImmutableMap.of("index", 5, "time", 12)),
+                                        "1", 2,
+                                        "2", new MockMetadataView(ImmutableMap.of("index", 0, "time", 7))
+                                ))
+                        )
+                        .put("skip", 12)
+                        .build()
         );
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 100, 100);
@@ -663,7 +665,7 @@ public final class AnimationMetadataAnalyzerTest {
         assertTrue(metadata.parts().get(0).smoothAlpha());
         assertFalse(metadata.parts().get(0).daytimeSync());
         assertEquals(
-                List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 5), IntIntPair.of(0, 7)),
+                List.of(Pair.of(5, 12), Pair.of(2, 5), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -1070,29 +1072,35 @@ public final class AnimationMetadataAnalyzerTest {
 
     @Test
     public void analyze_HasPartsAndRegularAnimation_RegularAnimationIgnored() throws InvalidMetadataException {
-        MetadataView metadataView = new MockMetadataView(ImmutableMap.of(
-                "width", 18,
-                "height", 27,
-                "frametime", 5,
-                "interpolate", true,
-                "daytimeSync", false,
-                "frames",
-                new MockMetadataView(ImmutableMap.of(
-                        "0", new MockMetadataView(ImmutableMap.of("index", 5, "time", 12)),
-                        "1", 2,
-                        "2", new MockMetadataView(ImmutableMap.of("index", 0, "time", 7))
-                )),
-                "skip", 12,
-                "parts", new MockMetadataView(ImmutableMap.of(
-                        "0", new MockMetadataView(ImmutableMap.of(
-                                "width", 5,
-                                "height", 10,
-                                "texture", MOCK_TEXTURE.apply(10, 20),
-                                "x", 0,
-                                "y", 0
-                        ))
-                ))
-        ));
+        MetadataView metadataView = new MockMetadataView(
+                new ImmutableMap.Builder<String, Object>()
+                        .put("width", 18)
+                        .put("height", 27)
+                        .put("frametime", 5)
+                        .put("interpolate", true)
+                        .put("daytimeSync", false)
+                        .put(
+                                "frames",
+                                new MockMetadataView(ImmutableMap.of(
+                                        "0", new MockMetadataView(ImmutableMap.of("index", 5, "time", 12)),
+                                        "1", 2,
+                                        "2", new MockMetadataView(ImmutableMap.of("index", 0, "time", 7))
+                                ))
+                        )
+                        .put("skip", 12)
+                        .put(
+                                "parts", new MockMetadataView(ImmutableMap.of(
+                                        "0", new MockMetadataView(ImmutableMap.of(
+                                                "width", 5,
+                                                "height", 10,
+                                                "texture", MOCK_TEXTURE.apply(10, 20),
+                                                "x", 0,
+                                                "y", 0
+                                        ))
+                                ))
+                        )
+                        .build()
+        );
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
         assertEquals(10, (int) metadata.frameWidth().orElseThrow());
@@ -1115,33 +1123,39 @@ public final class AnimationMetadataAnalyzerTest {
                                 "x", 0,
                                 "y", 0
                         )),
-                        "1", new MockMetadataView(ImmutableMap.of(
-                                "texture", MOCK_TEXTURE.apply(108, 27),
-                                "x", 1,
-                                "y", 2,
-                                "width", 18,
-                                "height", 27,
-                                "frametime", 5,
-                                "interpolate", true,
-                                "smoothAlpha", true,
-                                "frames",
-                                new MockMetadataView(ImmutableMap.of(
-                                        "0", new MockMetadataView(ImmutableMap.of("index", 5, "time", 12)),
-                                        "1", 2,
-                                        "2", new MockMetadataView(ImmutableMap.of("index", 0, "time", 7))
-                                )),
-                                "skip", 12
-                        )),
-                        "2", new MockMetadataView(ImmutableMap.of(
-                                "texture", MOCK_TEXTURE.apply(10, 60),
-                                "x", 4,
-                                "y", 4,
-                                "frametime", 15,
-                                "interpolate", true,
-                                "daytimeSync", true
+                        "1", new MockMetadataView(
+                                new ImmutableMap.Builder<String, Object>()
+                                        .put("texture", MOCK_TEXTURE.apply(108, 27))
+                                        .put("x", 1)
+                                        .put("y", 2)
+                                        .put("width", 18)
+                                        .put("height", 27)
+                                        .put("frametime", 5)
+                                        .put("interpolate", true)
+                                        .put("smoothAlpha", true)
+                                        .put(
+                                                "frames",
+                                                new MockMetadataView(ImmutableMap.of(
+                                                        "0", new MockMetadataView(ImmutableMap.of("index", 5, "time", 12)),
+                                                        "1", 2,
+                                                        "2", new MockMetadataView(ImmutableMap.of("index", 0, "time", 7))
+                                                ))
+                                        )
+                                        .put("skip", 12)
+                                        .build()
+                        ),
+                        "2", new MockMetadataView(
+                                new ImmutableMap.Builder<String, Object>()
+                                        .put("texture", MOCK_TEXTURE.apply(10, 60))
+                                        .put("x", 4)
+                                        .put("y", 4)
+                                        .put("frametime", 15)
+                                        .put("interpolate", true)
+                                        .put("daytimeSync", true)
+                                        .build()
                         ))
                 ))
-        ));
+        );
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 100, 200);
         assertEquals(100, (int) metadata.frameWidth().orElseThrow());
@@ -1168,7 +1182,7 @@ public final class AnimationMetadataAnalyzerTest {
         assertTrue(metadata.parts().get(1).smoothAlpha());
         assertFalse(metadata.parts().get(1).daytimeSync());
         assertEquals(
-                List.of(IntIntPair.of(5, 12), IntIntPair.of(2, 5), IntIntPair.of(0, 7)),
+                List.of(Pair.of(5, 12), Pair.of(2, 5), Pair.of(0, 7)),
                 metadata.parts().get(1).predefinedFrames()
         );
 

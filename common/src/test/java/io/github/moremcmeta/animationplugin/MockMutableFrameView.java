@@ -26,6 +26,8 @@ import io.github.moremcmeta.moremcmeta.api.math.Point;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 
+import java.util.function.LongConsumer;
+
 /**
  * Mock implementation of a {@link MutableFrameView}.
  * @author soir20
@@ -59,8 +61,8 @@ public final class MockMutableFrameView implements MutableFrameView {
     @Override
     public void transform(ColorTransform transform, Area applyArea) {
         Long2IntMap oldColors = new Long2IntOpenHashMap();
-        applyArea.forEach((point) -> oldColors.put(point, PIXELS[Point.y(point)][Point.x(point)]));
-        applyArea.forEach((point) -> {
+        applyArea.forEach((LongConsumer) (point) -> oldColors.put(point, PIXELS[Point.y(point)][Point.x(point)]));
+        applyArea.forEach((LongConsumer) (point) -> {
             int x = Point.x(point);
             int y = Point.y(point);
             PIXELS[y][x] = transform.transform(x, y, (depX, depY) -> oldColors.get(Point.pack(depX, depY)));

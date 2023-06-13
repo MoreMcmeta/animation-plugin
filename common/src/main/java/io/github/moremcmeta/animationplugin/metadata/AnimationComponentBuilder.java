@@ -34,7 +34,6 @@ import io.github.moremcmeta.moremcmeta.api.client.texture.MutableFrameView;
 import io.github.moremcmeta.moremcmeta.api.client.texture.TextureComponent;
 import io.github.moremcmeta.moremcmeta.api.math.Area;
 import io.github.moremcmeta.moremcmeta.api.math.Point;
-import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 import java.util.ArrayList;
@@ -128,7 +127,7 @@ public final class AnimationComponentBuilder implements ComponentBuilder {
                 animationMetadata.yInBase()
         );
 
-        List<IntIntPair> predefinedFrames = animationMetadata.predefinedFrames();
+        List<Pair<Integer, Integer>> predefinedFrames = animationMetadata.predefinedFrames();
 
         // Number of frames
         int frameCount = frames.size();
@@ -142,7 +141,7 @@ public final class AnimationComponentBuilder implements ComponentBuilder {
                 return animationMetadata.defaultTime();
             }
 
-            return predefinedFrames.get(index).rightInt();
+            return predefinedFrames.get(index).getSecond();
         };
 
         // Index mapping
@@ -151,7 +150,7 @@ public final class AnimationComponentBuilder implements ComponentBuilder {
                 return index;
             }
 
-            return predefinedFrames.get(index).leftInt();
+            return predefinedFrames.get(index).getFirst();
         };
 
         // Time retrieval

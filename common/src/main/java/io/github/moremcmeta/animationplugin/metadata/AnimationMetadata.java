@@ -18,8 +18,8 @@
 package io.github.moremcmeta.animationplugin.metadata;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
 import io.github.moremcmeta.animationplugin.animate.Frame;
-import it.unimi.dsi.fastutil.ints.IntIntPair;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +36,7 @@ public final class AnimationMetadata {
     private final int DEFAULT_TIME;
     private final boolean INTERPOLATE;
     private final boolean SMOOTH_ALPHA;
-    private final ImmutableList<IntIntPair> FRAMES;
+    private final ImmutableList<Pair<Integer, Integer>> FRAMES;
     private final int SKIP_TICKS;
     private final boolean DAYTIME_SYNC;
     private final int X_IN_BASE;
@@ -61,7 +61,7 @@ public final class AnimationMetadata {
      * @param resourceCloser    closes resources associated with this animation
      */
     public AnimationMetadata(int frameWidth, int frameHeight, int defaultTime, boolean interpolate, boolean smoothAlpha,
-                             List<IntIntPair> frames, int skipTicks, boolean daytimeSync, int xInBase, int yInBase,
+                             List<Pair<Integer, Integer>> frames, int skipTicks, boolean daytimeSync, int xInBase, int yInBase,
                              Optional<List<Frame>> partFrames, Runnable resourceCloser) {
         FRAME_WIDTH = frameWidth;
         FRAME_HEIGHT = frameHeight;
@@ -122,7 +122,7 @@ public final class AnimationMetadata {
      * then all the frames in the animation should be used with the default frame time.
      * @return all predefined frames in the animation
      */
-    public ImmutableList<IntIntPair> predefinedFrames() {
+    public ImmutableList<Pair<Integer, Integer>> predefinedFrames() {
         return FRAMES;
     }
 
