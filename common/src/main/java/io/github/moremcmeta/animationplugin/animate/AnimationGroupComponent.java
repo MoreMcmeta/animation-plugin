@@ -56,12 +56,14 @@ public final class AnimationGroupComponent implements TextureComponent<CurrentFr
             predefinedFrameCache = wrapFrames(predefinedFrames);
         }
 
-        COMPONENTS.forEach((pair) ->
-            pair.getSecond().ifPresentOrElse(
-                    (frames) -> pair.getFirst().onTick(currentFrame, frames),
-                    () -> pair.getFirst().onTick(currentFrame, predefinedFrameCache)
-            )
-        );
+        COMPONENTS.forEach((pair) -> {
+            Optional<List<Frame>> frames = pair.getSecond();
+            if (frames.isPresent()) {
+                pair.getFirst().onTick(currentFrame, frames.get());
+            } else {
+                pair.getFirst().onTick(currentFrame, predefinedFrameCache);
+            }
+        });
     }
 
     @Override

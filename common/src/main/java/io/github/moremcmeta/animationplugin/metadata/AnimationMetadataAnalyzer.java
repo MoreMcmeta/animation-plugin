@@ -127,7 +127,7 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
 
         int frameWidth = metadataFrameWidth.orElse(imageWidth);
         int frameHeight = metadataFrameHeight.orElse(imageHeight);
-        if (metadataFrameWidth.isEmpty() && metadataFrameHeight.isEmpty()) {
+        if (!metadataFrameWidth.isPresent() && !metadataFrameHeight.isPresent()) {
             int dimension = Math.min(frameWidth, frameHeight);
             frameWidth = dimension;
             frameHeight = dimension;

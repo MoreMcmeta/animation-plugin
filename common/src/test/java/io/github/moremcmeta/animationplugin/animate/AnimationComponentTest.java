@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
@@ -585,7 +586,9 @@ public final class AnimationComponentTest {
     }
     
     private static List<Frame> makeMockFrames(int frames) {
-        return IntStream.range(0, frames).<Frame>mapToObj((index) -> (x, y) -> indexToColor(index)).toList();
+        return IntStream.range(0, frames).<Frame>mapToObj(
+                (index) -> (x, y) -> indexToColor(index)).collect(Collectors.toList()
+        );
     }
 
 }

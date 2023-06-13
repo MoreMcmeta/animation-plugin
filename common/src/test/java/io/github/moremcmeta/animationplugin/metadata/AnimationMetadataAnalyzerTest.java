@@ -17,6 +17,7 @@
 
 package io.github.moremcmeta.animationplugin.metadata;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
@@ -30,7 +31,6 @@ import org.junit.rules.ExpectedException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertEquals;
@@ -41,6 +41,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the {@link AnimationMetadataAnalyzer}.
  * @author soir20
  */
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public final class AnimationMetadataAnalyzerTest {
     private static final AnimationMetadataAnalyzer ANALYZER = new AnimationMetadataAnalyzer();
     @SuppressWarnings("resource")
@@ -70,8 +71,8 @@ public final class AnimationMetadataAnalyzerTest {
         );
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
 
-        assertEquals(7, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(7, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
     }
 
     @Test
@@ -81,8 +82,8 @@ public final class AnimationMetadataAnalyzerTest {
         );
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
 
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(7, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(7, (int) metadata.frameHeight().get());
     }
 
     @Test
@@ -92,8 +93,8 @@ public final class AnimationMetadataAnalyzerTest {
         );
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
 
-        assertEquals(7, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(7, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
     }
 
     @Test
@@ -103,8 +104,8 @@ public final class AnimationMetadataAnalyzerTest {
         );
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
 
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(7, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(7, (int) metadata.frameHeight().get());
     }
 
     @Test
@@ -154,8 +155,8 @@ public final class AnimationMetadataAnalyzerTest {
         );
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
 
-        assertEquals(7, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(13, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(7, (int) metadata.frameWidth().get());
+        assertEquals(13, (int) metadata.frameHeight().get());
     }
 
     @Test
@@ -165,8 +166,8 @@ public final class AnimationMetadataAnalyzerTest {
         );
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
 
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(10, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(10, (int) metadata.frameHeight().get());
     }
 
     @Test
@@ -176,8 +177,8 @@ public final class AnimationMetadataAnalyzerTest {
         );
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 20, 10);
 
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(10, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(10, (int) metadata.frameHeight().get());
     }
 
     @Test
@@ -373,7 +374,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(Pair.of(5, 1), Pair.of(2, 1), Pair.of(0, 1)),
+                ImmutableList.of(Pair.of(5, 1), Pair.of(2, 1), Pair.of(0, 1)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -412,7 +413,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(Pair.of(5, 12), Pair.of(2, 4), Pair.of(0, 7)),
+                ImmutableList.of(Pair.of(5, 12), Pair.of(2, 4), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -520,7 +521,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(Pair.of(5, 12), Pair.of(2, 1), Pair.of(0, 7)),
+                ImmutableList.of(Pair.of(5, 12), Pair.of(2, 1), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -541,7 +542,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(Pair.of(5, 12), Pair.of(2, 13), Pair.of(0, 7)),
+                ImmutableList.of(Pair.of(5, 12), Pair.of(2, 13), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -562,7 +563,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(Pair.of(5, 12), Pair.of(2, 13), Pair.of(0, 7)),
+                ImmutableList.of(Pair.of(5, 12), Pair.of(2, 13), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -584,7 +585,7 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 100);
 
         assertEquals(
-                List.of(Pair.of(5, 12), Pair.of(2, 13), Pair.of(8, 2)),
+                ImmutableList.of(Pair.of(5, 12), Pair.of(2, 13), Pair.of(8, 2)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -657,15 +658,15 @@ public final class AnimationMetadataAnalyzerTest {
         );
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 100, 100);
-        assertEquals(18, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(27, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(18, (int) metadata.frameWidth().get());
+        assertEquals(27, (int) metadata.frameHeight().get());
         assertEquals(5, metadata.parts().get(0).defaultTime());
         assertEquals(12, metadata.parts().get(0).skipTicks());
         assertTrue(metadata.parts().get(0).interpolate());
         assertTrue(metadata.parts().get(0).smoothAlpha());
         assertFalse(metadata.parts().get(0).daytimeSync());
         assertEquals(
-                List.of(Pair.of(5, 12), Pair.of(2, 5), Pair.of(0, 7)),
+                ImmutableList.of(Pair.of(5, 12), Pair.of(2, 5), Pair.of(0, 7)),
                 metadata.parts().get(0).predefinedFrames()
         );
     }
@@ -697,8 +698,8 @@ public final class AnimationMetadataAnalyzerTest {
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
 
         assertTrue(metadata.parts().isEmpty());
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
     }
 
     @Test
@@ -824,8 +825,8 @@ public final class AnimationMetadataAnalyzerTest {
         ));
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
         assertEquals(0, metadata.parts().get(0).xInBase());
         assertEquals(0, metadata.parts().get(0).yInBase());
     }
@@ -845,8 +846,8 @@ public final class AnimationMetadataAnalyzerTest {
         ));
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
         assertEquals(5, metadata.parts().get(0).xInBase());
         assertEquals(0, metadata.parts().get(0).yInBase());
     }
@@ -866,8 +867,8 @@ public final class AnimationMetadataAnalyzerTest {
         ));
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
         assertEquals(0, metadata.parts().get(0).xInBase());
         assertEquals(10, metadata.parts().get(0).yInBase());
     }
@@ -887,8 +888,8 @@ public final class AnimationMetadataAnalyzerTest {
         ));
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
         assertEquals(5, metadata.parts().get(0).xInBase());
         assertEquals(10, metadata.parts().get(0).yInBase());
     }
@@ -1013,8 +1014,8 @@ public final class AnimationMetadataAnalyzerTest {
         ));
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
 
         assertEquals(5, metadata.parts().get(0).frameWidth());
         assertEquals(10, metadata.parts().get(0).frameHeight());
@@ -1037,8 +1038,8 @@ public final class AnimationMetadataAnalyzerTest {
         ));
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
 
         assertEquals(4, metadata.parts().get(0).frameWidth());
         assertEquals(10, metadata.parts().get(0).frameHeight());
@@ -1061,8 +1062,8 @@ public final class AnimationMetadataAnalyzerTest {
         ));
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
 
         assertEquals(5, metadata.parts().get(0).frameWidth());
         assertEquals(9, metadata.parts().get(0).frameHeight());
@@ -1103,8 +1104,8 @@ public final class AnimationMetadataAnalyzerTest {
         );
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 10, 20);
-        assertEquals(10, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(20, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(10, (int) metadata.frameWidth().get());
+        assertEquals(20, (int) metadata.frameHeight().get());
 
         assertEquals(5, metadata.parts().get(0).frameWidth());
         assertEquals(10, metadata.parts().get(0).frameHeight());
@@ -1158,8 +1159,8 @@ public final class AnimationMetadataAnalyzerTest {
         );
 
         AnimationGroupMetadata metadata = (AnimationGroupMetadata) ANALYZER.analyze(metadataView, 100, 200);
-        assertEquals(100, (int) metadata.frameWidth().orElseThrow());
-        assertEquals(200, (int) metadata.frameHeight().orElseThrow());
+        assertEquals(100, (int) metadata.frameWidth().get());
+        assertEquals(200, (int) metadata.frameHeight().get());
 
         assertEquals(5, metadata.parts().get(0).frameWidth());
         assertEquals(10, metadata.parts().get(0).frameHeight());
@@ -1182,7 +1183,7 @@ public final class AnimationMetadataAnalyzerTest {
         assertTrue(metadata.parts().get(1).smoothAlpha());
         assertFalse(metadata.parts().get(1).daytimeSync());
         assertEquals(
-                List.of(Pair.of(5, 12), Pair.of(2, 5), Pair.of(0, 7)),
+                ImmutableList.of(Pair.of(5, 12), Pair.of(2, 5), Pair.of(0, 7)),
                 metadata.parts().get(1).predefinedFrames()
         );
 

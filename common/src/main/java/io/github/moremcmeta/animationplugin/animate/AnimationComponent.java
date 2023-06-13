@@ -52,7 +52,7 @@ public final class AnimationComponent {
 
         if (timeOptional.isPresent()) {
             long currentTime = timeOptional.get();
-            int ticksToAdd = Math.floorMod(currentTime - STATE.ticks(), SYNC_TICKS) + TICKS_UNTIL_START;
+            int ticksToAdd = (int) Math.floorMod(currentTime - STATE.ticks(), (long) SYNC_TICKS) + TICKS_UNTIL_START;
 
             STATE.tick(ticksToAdd);
         } else {
