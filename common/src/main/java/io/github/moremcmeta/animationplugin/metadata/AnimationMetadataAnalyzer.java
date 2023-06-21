@@ -26,7 +26,6 @@ import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataAnalyzer;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.MetadataView;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -121,7 +120,7 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
      * @throws InvalidMetadataException if the metadata is not valid
      */
     private AnimationMetadata readAnimationProperties(MetadataView metadata, int imageWidth, int imageHeight,
-                                                      @Nullable NativeImage partTexture) throws InvalidMetadataException {
+                                                      NativeImage partTexture) throws InvalidMetadataException {
         Optional<Integer> metadataFrameWidth = metadata.integerValue("width");
         Optional<Integer> metadataFrameHeight = metadata.integerValue("height");
 
