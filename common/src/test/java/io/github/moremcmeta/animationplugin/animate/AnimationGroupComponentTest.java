@@ -88,6 +88,7 @@ public final class AnimationGroupComponentTest {
             groupComponent.onTick(currentFrameView, persistentFrames);
         }
 
+        groupComponent.onUse(currentFrameView, persistentFrames);
         assertEquals(
                 INTERPOLATOR.interpolate(80, 50, indexToColor(7), indexToColor(8)),
                 currentFrameView.color(0, 0)
@@ -131,6 +132,7 @@ public final class AnimationGroupComponentTest {
             groupComponent.onTick(currentFrameView, persistentFrames);
         }
 
+        groupComponent.onUse(currentFrameView, persistentFrames);
         assertEquals(
                 INTERPOLATOR.interpolate(80, 50, indexToColor(17), indexToColor(18)),
                 currentFrameView.color(0, 0)
@@ -216,6 +218,7 @@ public final class AnimationGroupComponentTest {
             groupComponent.onTick(currentFrameView, persistentFrames);
         }
 
+        groupComponent.onUse(currentFrameView, persistentFrames);
         assertEquals(
                 INTERPOLATOR.interpolate(80, 50, indexToColor(7), indexToColor(8)),
                 currentFrameView.color(9, 19)

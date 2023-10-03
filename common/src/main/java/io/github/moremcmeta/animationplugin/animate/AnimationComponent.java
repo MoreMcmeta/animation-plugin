@@ -43,11 +43,9 @@ public final class AnimationComponent {
     private final int Y_IN_BASE;
 
     /**
-     * Updates the animation on tick.
-     * @param currentFrame          current frame of the animated texture (to which all animations write)
-     * @param predefinedFrames      predefined frames in the base texture
+     * Updates the animation state on tick.
      */
-    public void onTick(CurrentFrameView currentFrame, List<Frame> predefinedFrames) {
+    public void onTick() {
         Optional<Long> timeOptional = TIME_GETTER.get();
 
         if (timeOptional.isPresent()) {
@@ -58,7 +56,14 @@ public final class AnimationComponent {
         } else {
             STATE.tick(1);
         }
+    }
 
+    /**
+     * Updates the texture when it is used.
+     * @param currentFrame          current frame of the animated texture (to which all animations write)
+     * @param predefinedFrames      predefined frames in the base texture
+     */
+    public void onUse(CurrentFrameView currentFrame, List<Frame> predefinedFrames) {
         int startIndex = FRAME_INDEX_MAPPER.applyAsInt(STATE.startIndex());
         int endIndex = FRAME_INDEX_MAPPER.applyAsInt(STATE.endIndex());
 
