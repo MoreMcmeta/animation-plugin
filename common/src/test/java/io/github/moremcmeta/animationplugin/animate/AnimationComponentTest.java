@@ -196,7 +196,7 @@ public final class AnimationComponentTest {
                 .build();
 
         expectedException.expect(NullPointerException.class);
-        component.onTick();
+        component.onTick(new MockCurrentFrameView(), makeMockFrames(5), 1);
     }
 
     @Test
@@ -216,10 +216,9 @@ public final class AnimationComponentTest {
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
         while (tick.getAndIncrement() < animationLength) {
-            component.onTick();
+            component.onTick(currentFrameView, makeMockFrames(frames), 1);
         }
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(indexToColor(0), currentFrameView.color(0, 0));
     }
 
@@ -239,10 +238,9 @@ public final class AnimationComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            component.onTick();
+            component.onTick(currentFrameView, makeMockFrames(frames), 1);
         }
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(80, 50, indexToColor(7), indexToColor(8)),
                 currentFrameView.color(0, 0)
@@ -265,10 +263,9 @@ public final class AnimationComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            component.onTick();
+            component.onTick(currentFrameView, makeMockFrames(frames), 1);
         }
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(80, 55, indexToColor(7), indexToColor(8)),
                 currentFrameView.color(0, 0)
@@ -291,10 +288,9 @@ public final class AnimationComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            component.onTick();
+            component.onTick(currentFrameView, makeMockFrames(frames), 1);
         }
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(80, 65, indexToColor(7), indexToColor(8)),
                 currentFrameView.color(0, 0)
@@ -317,9 +313,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(10, 1, indexToColor(0), indexToColor(1)),
                 currentFrameView.color(0, 0)
@@ -342,9 +337,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 indexToColor(0),
                 currentFrameView.color(0, 0)
@@ -367,9 +361,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(90, 15, indexToColor(8), indexToColor(9)),
                 currentFrameView.color(0, 0)
@@ -392,9 +385,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(90, 65, indexToColor(8), indexToColor(9)),
                 currentFrameView.color(0, 0)
@@ -417,9 +409,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(90, 20, indexToColor(8), indexToColor(9)),
                 currentFrameView.color(0, 0)
@@ -442,9 +433,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(90, 30, indexToColor(8), indexToColor(9)),
                 currentFrameView.color(0, 0)
@@ -467,9 +457,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(90, 70, indexToColor(8), indexToColor(9)),
                 currentFrameView.color(0, 0)
@@ -492,9 +481,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(90, 81, indexToColor(8), indexToColor(9)),
                 currentFrameView.color(0, 0)
@@ -517,9 +505,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(90, 15, indexToColor(8), indexToColor(9)),
                 currentFrameView.color(0, 0)
@@ -542,9 +529,8 @@ public final class AnimationComponentTest {
 
         MockCurrentFrameView currentFrameView = new MockCurrentFrameView();
 
-        component.onTick();
+        component.onTick(currentFrameView, makeMockFrames(frames), 1);
 
-        component.onUse(currentFrameView, makeMockFrames(frames));
         assertEquals(
                 INTERPOLATOR.interpolate(60, 42, indexToColor(5), indexToColor(6)),
                 currentFrameView.color(0, 0)
@@ -581,10 +567,9 @@ public final class AnimationComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            component.onTick();
+            component.onTick(currentFrameView, mockFrames, 1);
         }
 
-        component.onUse(currentFrameView, mockFrames);
         assertEquals(
                 INTERPOLATOR.interpolate(80, 50, indexToColor(7), indexToColor(8)),
                 currentFrameView.color(7, 14)

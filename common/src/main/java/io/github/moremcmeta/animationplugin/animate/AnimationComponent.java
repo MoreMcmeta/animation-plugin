@@ -44,26 +44,22 @@ public final class AnimationComponent {
 
     /**
      * Updates the animation state on tick.
+     * @param currentFrame          current frame of the animated texture (to which all animations write)
+     * @param predefinedFrames      predefined frames in the base texture
+     * @param ticks                 number of ticks that have passed since the last time this method was called
      */
-    public void onTick() {
+    public void onTick(CurrentFrameView currentFrame, List<Frame> predefinedFrames, int ticks) {
         Optional<Long> timeOptional = TIME_GETTER.get();
 
         if (timeOptional.isPresent()) {
             long currentTime = timeOptional.get();
-            int ticksToAdd = Math.floorMod(currentTime - STATE.ticks(), SYNC_TICKS) + TICKS_UNTIL_START;
+            int ticksUntilTime = Math.floorMod(currentTime - STATE.ticks(), SYNC_TICKS) + TICKS_UNTIL_START;
 
-            STATE.tick(ticksToAdd);
+            STATE.tick(ticksUntilTime);
         } else {
-            STATE.tick(1);
+            STATE.tick(ticks);
         }
-    }
 
-    /**
-     * Updates the texture when it is used.
-     * @param currentFrame          current frame of the animated texture (to which all animations write)
-     * @param predefinedFrames      predefined frames in the base texture
-     */
-    public void onUse(CurrentFrameView currentFrame, List<Frame> predefinedFrames) {
         int startIndex = FRAME_INDEX_MAPPER.applyAsInt(STATE.startIndex());
         int endIndex = FRAME_INDEX_MAPPER.applyAsInt(STATE.endIndex());
 
