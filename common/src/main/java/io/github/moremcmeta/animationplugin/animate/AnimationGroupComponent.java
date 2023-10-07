@@ -51,7 +51,7 @@ public final class AnimationGroupComponent implements TextureComponent<CurrentFr
     }
 
     @Override
-    public void onTick(CurrentFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames) {
+    public void onTick(CurrentFrameView currentFrame, FrameGroup<? extends PersistentFrameView> predefinedFrames, int ticks) {
         if (predefinedFrameCache == null) {
             predefinedFrameCache = wrapFrames(predefinedFrames);
         }
@@ -59,9 +59,9 @@ public final class AnimationGroupComponent implements TextureComponent<CurrentFr
         COMPONENTS.forEach((pair) -> {
             Optional<List<Frame>> frames = pair.getSecond();
             if (frames.isPresent()) {
-                pair.getFirst().onTick(currentFrame, frames.get());
+                pair.getFirst().onTick(currentFrame, frames.get(), ticks);
             } else {
-                pair.getFirst().onTick(currentFrame, predefinedFrameCache);
+                pair.getFirst().onTick(currentFrame, predefinedFrameCache, ticks);
             }
         });
     }

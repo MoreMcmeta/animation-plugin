@@ -85,7 +85,7 @@ public final class AnimationGroupComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            groupComponent.onTick(currentFrameView, persistentFrames);
+            groupComponent.onTick(currentFrameView, persistentFrames, 1);
         }
 
         assertEquals(
@@ -128,7 +128,7 @@ public final class AnimationGroupComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            groupComponent.onTick(currentFrameView, persistentFrames);
+            groupComponent.onTick(currentFrameView, persistentFrames, 1);
         }
 
         assertEquals(
@@ -213,7 +213,7 @@ public final class AnimationGroupComponentTest {
 
         int animationLength = 330;
         for (int tick = 0; tick < animationLength; tick++) {
-            groupComponent.onTick(currentFrameView, persistentFrames);
+            groupComponent.onTick(currentFrameView, persistentFrames, 1);
         }
 
         assertEquals(
