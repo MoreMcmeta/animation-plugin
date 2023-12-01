@@ -144,7 +144,7 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
                     + imageHeight);
         }
 
-        int defaultTime = metadata.integerValue("frametime").orElse(1);
+        int defaultTime = (int) (double) metadata.doubleValue("frametime").orElse(1d);
         if (defaultTime <= 0) {
             throw new InvalidMetadataException("Frame time must be positive but was: " + defaultTime);
         }
@@ -278,7 +278,7 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
             throw new InvalidMetadataException("Frame index cannot be negative, but was " + index);
         }
 
-        int frameTime = frameObj.integerValue("time").orElse(defaultTime);
+        int frameTime = (int) (double) frameObj.doubleValue("time").orElse((double) defaultTime);
         if (frameTime <= 0) {
             throw new InvalidMetadataException("Frame time must be greater than zero, but was " + frameTime);
         }
