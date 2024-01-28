@@ -10,6 +10,7 @@ authors = "soir20"
 description = '''
 Default plugin for MoreMcmeta that animates textures.
 '''
+logoFile="moremcmeta-logo-gradient.png"
 
 [[dependencies.moremcmeta_animation_plugin]]
 modId = "moremcmeta"
