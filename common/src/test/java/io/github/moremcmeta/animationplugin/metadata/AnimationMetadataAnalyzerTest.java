@@ -1069,7 +1069,7 @@ public final class AnimationMetadataAnalyzerTest {
                         "0", new MockMetadataView(ImmutableMap.of(
                                 "width", 4,
                                 "height", 10,
-                                "texture", MOCK_TEXTURE.apply(10, 20),
+                                "texture", MOCK_TEXTURE.apply(10, 22),
                                 "x", 0,
                                 "y", 0
                         ))
@@ -1084,6 +1084,7 @@ public final class AnimationMetadataAnalyzerTest {
         assertEquals(10, metadata.parts().get(0).frameHeight());
         assertEquals(0, metadata.parts().get(0).xInBase());
         assertEquals(0, metadata.parts().get(0).yInBase());
+        assertEquals(4, metadata.parts().get(0).partFrames().get().size());
     }
 
     @Test

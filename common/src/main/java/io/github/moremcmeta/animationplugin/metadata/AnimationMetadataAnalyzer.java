@@ -225,10 +225,12 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
     private List<Frame> findFrames(NativeImage texture, int frameWidth, int frameHeight) {
         List<Frame> frames = new ArrayList<>();
 
-        for (int minY = 0; minY < texture.getHeight(); minY += frameHeight) {
-            for (int minX = 0; minX < texture.getWidth(); minX += frameWidth) {
-                int finalMinX = minX;
-                int finalMinY = minY;
+        int framesY = texture.getHeight() / frameHeight;
+        int framesX = texture.getWidth() / frameWidth;
+        for (int frameY = 0; frameY < framesY; frameY++) {
+            for (int frameX = 0; frameX < framesX; frameX++) {
+                int finalMinX = frameX * frameWidth;
+                int finalMinY = frameY * frameHeight;
                 frames.add((x, y) -> texture.getPixelRGBA(finalMinX + x, finalMinY + y));
             }
         }
