@@ -18,6 +18,7 @@
 package io.github.moremcmeta.animationplugin.metadata;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.jimfs.Jimfs;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.moremcmeta.animationplugin.MockMetadataView;
 import io.github.moremcmeta.moremcmeta.api.client.metadata.InvalidMetadataException;
@@ -30,7 +31,11 @@ import org.junit.rules.ExpectedException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertEquals;
@@ -43,12 +48,15 @@ import static org.junit.Assert.assertTrue;
  */
 public final class AnimationMetadataAnalyzerTest {
     private static final AnimationMetadataAnalyzer ANALYZER = new AnimationMetadataAnalyzer();
+    private static final FileSystem FILE_SYSTEM = Jimfs.newFileSystem();
+    private static final AtomicInteger TEST_IMAGE_COUNTER = new AtomicInteger();
     @SuppressWarnings("resource")
     private static final BiFunction<Integer, Integer, InputStream> MOCK_TEXTURE = (w, h) -> {
         try {
-            return new ByteArrayInputStream(
-                    new NativeImage(w, h, false).asByteArray()
-            );
+            NativeImage image = new NativeImage(w, h, false);
+            Path path = FILE_SYSTEM.getPath("test_image" + TEST_IMAGE_COUNTER.incrementAndGet());
+            image.writeToFile(path);
+            return Files.newInputStream(path);
         } catch (IOException err) {
             throw new RuntimeException(err);
         }

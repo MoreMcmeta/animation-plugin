@@ -231,7 +231,7 @@ public final class AnimationMetadataAnalyzer implements MetadataAnalyzer {
             for (int frameX = 0; frameX < framesX; frameX++) {
                 int finalMinX = frameX * frameWidth;
                 int finalMinY = frameY * frameHeight;
-                frames.add((x, y) -> texture.getPixelRGBA(finalMinX + x, finalMinY + y));
+                frames.add((x, y) -> texture.getPixel(finalMinX + x, finalMinY + y));
             }
         }
 
